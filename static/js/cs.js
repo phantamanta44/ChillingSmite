@@ -26,15 +26,14 @@ $(document).ready(function() {
     }); 
     
     Controls.qName.keydown(function(e) {
-        if (e.keyCode === 13 && !e.shiftKey)
-        Controls.qSubmit.click();
+        if (e.keyCode === 13)
+            Controls.qSubmit.click();
     })
     
     if (!loadQuery())
         $('#secondpage').remove();
     else {
         $('#firstpage').remove();
-        console.log('lol');
         Controls.qName.val(req.n);
         Controls.qServ.val(req.s);
     }
