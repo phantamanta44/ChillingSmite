@@ -1,9 +1,23 @@
 $(document).ready(function() {
     
+    // Douglas Crockford's Remedial JavaScript
+    if (!String.prototype.supplant) {
+        String.prototype.supplant = function (o) {
+            return this.replace(
+                /\{([^{}]*)\}/g,
+                function (a, b) {
+                    var r = o[b];
+                    return typeof r === 'string' || typeof r === 'number' ? r : a;
+                }
+            );
+        };
+    }
+    
     var Controls = {
         qSubmit: $('#submit'),
         qName: $('#inputName'),
-        qServ: $('#inputServ')
+        qServ: $('#inputServ'),
+        sIcon: $('#profileIcon')
     };
     
     var query;
@@ -20,20 +34,56 @@ $(document).ready(function() {
         return query.n && query.s && (validServers.indexOf(query.s) != -1);
     };
     
-    var reqLoaded = false, reqData;
+    var cache;
     
-    var requestFromApi = function(serv, ept, params) {
-        var request = baseRequest.replace('$serv', serv);
-        var req = new XMLHttpRequest();
-        req.addEventListener('load', function(data) {
-            reqData = req.responseText;
-            reqLoaded = true;
+    var cacheData = function() {
+        var cacheNode = $('#nodeCache');
+        cache = cacheNode.attr('title');
+        cacheNode.remove();
+        cache = hexToBase64(cache);
+    }
+    
+    var getCachedData = function() {
+        if (!cache)
+            cacheData();
+        return cache.replace(/\+/g, '-').toLowerCase();
+    };
+    
+    var requestXml = function(url, cb) {
+        var req = new XMLHttpRequest(), reqData;
+        req.addEventListener('load', function() {
+            cb.call(req.responseText);
         });
-        req.open('GET', request);    
+        req.open('GET', url);
         req.send();
-        while (!reqLoaded) { /* Wait for it... */ }
-        reqLoaded = false;
-        return reqData;
+    };
+    
+    var Endpoint = {
+        summonerByName: {serv: true, vers: 'v1.4', ept: 'summoner/by-name'}
+    };
+    var baseRequest = 'https://{serv}.api.pvp.net/api/lol/{servSpec}{vers}/{ept}/{params}?api_key={cache}';
+    
+    var requestFromApi = function(serv, ept, params, cb) {
+        var request = baseRequest.supplant({serv: serv, servSpec: ept.serv ? serv + '/' : '', vers: ept.vers, ept: ept.ept, params: params, cache: getCachedData()});
+        requestXml(request, cb);
+    };
+    
+    var DDPoint = {
+        summonerIcon: {ept: 'profileicon', staticReq: false}
+    };
+    var baseDataDragon = 'https://ddragon.api.pvp.net/cdn/$vers/$ept/$params';
+    var baseDataDragonStatic = 'http://ddragon.api.pvp.net/cdn/$ept/$params';
+    var ddVers = '5.19.1';
+    
+    var requestFromDd = function(ept, params) {
+        var request = ept.staticReq ? baseDataDragonStatic : baseDataDragon;
+        request = request.supplant({ept: ept.ept, params: params, vers: ddVers});
+        return request;
+    };
+    
+    var updatePage = function(rawJson) {
+        var data = JSON.parse(rawJson);
+        Controls.sIcon.attr('src', requestFromDd(DDPoint.summonerIcon, data.profileIconId + '.png'));
     };
     
     Controls.qSubmit.click(function(e) {
@@ -44,17 +94,18 @@ $(document).ready(function() {
     Controls.qName.keydown(function(e) {
         if (e.keyCode === 13)
             Controls.qSubmit.click();
-    })
+    });
     
-    var headerText = '<a href="http://$loc" class="hiddenLink"><h2 id="headerLink">Chilling Smite</h2></a>';
+    var headerText = '<a href="http://{loc}" class="hiddenLink"><h2 id="headerLink">Chilling Smite</h2></a>';
     
     if (!loadQuery())
         $('#secondpage').remove();
     else {
         $('#firstpage').remove();
-        $('#qForm').prepend(headerText.replace('$loc', document.location.host + document.location.pathname));
+        $('#qForm').prepend(headerText.supplant({loc: document.location.host + document.location.pathname}));
         Controls.qName.val(query.n);
         Controls.qServ.val(query.s);
+        var data = requestFromApi(query.s, Endpoint.summonerByName, query.n, updatePage);
     }
     
 });
