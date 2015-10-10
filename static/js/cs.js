@@ -17,7 +17,11 @@ $(document).ready(function() {
         qSubmit: $('#submit'),
         qName: $('#inputName'),
         qServ: $('#inputServ'),
-        sIcon: $('#profileIcon')
+        paneError: $('#errorPane'),
+        paneLeft: $('#leftPane'),
+        paneRight: $('#rightPane'),
+        sIcon: $('#profileIcon'),
+        sName: $('#theSummonerName')
     };
     
     var query;
@@ -52,7 +56,10 @@ $(document).ready(function() {
     var requestXml = function(url, cb) {
         var req = new XMLHttpRequest(), reqData;
         req.addEventListener('load', function() {
-            cb.call(req.responseText);
+            if (req.status === 200)
+                cb.call(this, req.responseText);
+            else
+                cb.call(false);
         });
         req.open('GET', url);
         req.send();
@@ -69,21 +76,30 @@ $(document).ready(function() {
     };
     
     var DDPoint = {
-        summonerIcon: {ept: 'profileicon', staticReq: false}
+        summonerIcon: {ept: 'img/profileicon', staticReq: false}
     };
-    var baseDataDragon = 'https://ddragon.api.pvp.net/cdn/$vers/$ept/$params';
-    var baseDataDragonStatic = 'http://ddragon.api.pvp.net/cdn/$ept/$params';
+    var baseDataDragon = 'https://ddragon.leagueoflegends.com/cdn/{vers}/{ept}/{params}';
+    var baseDataDragonStatic = 'http://ddragon.leagueoflegends.com/cdn/{ept}/{params}';
     var ddVers = '5.19.1';
     
     var requestFromDd = function(ept, params) {
         var request = ept.staticReq ? baseDataDragonStatic : baseDataDragon;
-        request = request.supplant({ept: ept.ept, params: params, vers: ddVers});
+        request = request.supplant({ept: ept.ept, params: encodeURIComponent(params), vers: ddVers});
         return request;
     };
     
     var updatePage = function(rawJson) {
-        var data = JSON.parse(rawJson);
-        Controls.sIcon.attr('src', requestFromDd(DDPoint.summonerIcon, data.profileIconId + '.png'));
+        if (!rawJson) {
+            Controls.paneLeft.remove();
+            Controls.paneRight.remove();
+            Controls.paneError.text('Summoner not found!');
+        }
+        else {
+            Controls.paneError.remove();
+            var data = JSON.parse(rawJson)[query.n.toLowerCase().replace(/\s/g, '')];
+            Controls.sIcon.attr('src', requestFromDd(DDPoint.summonerIcon, data.profileIconId + '.png'));
+            Controls.sName.text(data.name);
+        }
     };
     
     Controls.qSubmit.click(function(e) {
