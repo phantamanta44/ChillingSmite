@@ -110,14 +110,14 @@ $(document).ready(function() {
     var updatePage = function(rawJson) {
         if (!rawJson) {
             Controls.paneLeft.remove();
-            Controls.paneRight.remove();
+            Controls.paneRight.parent().remove();
             Controls.paneError.text('Summoner not found!');
         }
         else {
             data = JSON.parse(rawJson)[query.n.toLowerCase().replace(/\s/g, '')];
             if (data.status && data.status.status_code.startsWith(/[45]/)) {
                 Controls.paneLeft.remove();
-                Controls.paneRight.remove();
+                Controls.paneRight.parent().remove();
                 Controls.paneError.text(errorText.supplant({code: data.status.status_code, reason: data.status.message}));
                 return;
             }
