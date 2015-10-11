@@ -189,7 +189,13 @@ $(document).ready(function() {
                 }
             }
         }
-        thePlayer = players[data.id] = rPlayersCopy[0];
+        var count = {100: 0, 200: 0};
+        for (var k = 0; k < rPlayersCopy.length; k++)
+            count[rPlayersCopy[k].teamId]++;
+        if (count[100] > 1)
+            thePlayer = players[data.id] = rPlayersCopy[count[100]];
+        else
+            thePlayer = players[data.id] = rPlayersCopy[0];
         
         var won = wGame.stats.win;
         var upperCont = gbUpper.supplant({outcome: won ? 'VICTORY' : 'DEFEAT'});
