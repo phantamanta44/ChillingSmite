@@ -162,8 +162,15 @@ $(document).ready(function() {
     };
     
     var gbContent = '<div class="gbUpper">{upper}</div><div class="gbLower">{lower}</div>';
-    var gbUpper = '<img class="championLarge"/><div class="gameOutcome">{outcome}</div>';
-    var gbLower = '';
+    var gbUpper = '<div class="gbUpperLeft"><img class="championLarge"/><div class="gameOutcome">{outcome}</div></div>';
+    var gbLower = '<div class="gbLowerLeft"><div class="gameTime">{gameTime}</div><div class="gameType">{gameMode}</div></div>';
+    var gameTypes = {
+        NONE: 'Custom Match', NORMAL: 'Blind Pick 5v5', NORMAL_3x3: 'Blind Pick 3v3', ODIN_UNRANKED: 'Blind Pick Dominion', ARAM_UNRANKED_5x5: 'Blind Pick ARAM',
+        BOT: 'Botmatch 5v5', BOT_3x3: 'Botmatch 3v3', RANKED_SOLO_5x5: 'Solo Queue 5v5', RANKED_TEAM_3x3: 'Team Match 3v3', RANKED_TEAM_5x5: 'Team Match 5v5',
+        ONEFORALL_5x5: 'One for All', FIRSTBLOOD_1x1: 'Showdown 1v1', FIRSTBLOOD_2x2: 'Showdown 2v2', SR_6x6: 'Hexakill 5v5', CAP_5x5: 'Team Builder',
+        URF: 'Ultra Rapid Fire', URF_BOT: 'URF Botmatch', NIGHTMARE_BOT: 'Nightmare Botmatch', ASCENSION: 'Ascension', HEXAKILL: 'Hexakill 3v3',
+        KING_PORO: 'King Poro', COUNTER_PICK: 'Nemesis', BILGEWATER: 'Black Market Brawlers'
+    };
     
     var constructGameBlock = function(game, wGame) {
         var block = $('#gameBlock' + game.gameId);
@@ -187,7 +194,9 @@ $(document).ready(function() {
         var won = wGame.stats.win;
         var upperCont = gbUpper.supplant({outcome: won ? 'VICTORY' : 'DEFEAT'});
         
-        var lowerCont = gbLower.supplant({});
+        var modSec = game.gameDuration % 60;
+        var gameTime = '{min}:{sec}'.supplant({min: (game.gameDuration - modSec) / 60, sec: modSec < 10 ? '0' + modSec : modSec});
+        var lowerCont = gbLower.supplant({gameTime: gameTime, gameMode: gameTypes[wGame.subType]});
         
         block.html(gbContent.supplant({upper: upperCont, lower: lowerCont}));
         

@@ -188,8 +188,17 @@ select {
 
 .gbUpper, .gbLower {
     display: block;
+    height: 48px;
     text-align: left;
     width: 100%;
+}
+
+.gbUpper {
+    margin-bottom: 4px;
+}
+
+.gbUpperLeft {
+    width: 178px;
 }
 
 .championLarge {
@@ -209,6 +218,15 @@ select {
     font-weight: bold;
     font-size: 22px;
     border-radius: 5px;
+}
+
+.gbLowerLeft {
+    height: 100%;
+    font-size: 16px;
+}
+
+.gameTime, .gameType {
+    height: 24px;
 }
 
 #footer {
