@@ -16,6 +16,12 @@ h1 {
     margin-bottom: 48px;
 }
 
+h2 {
+    font-family: "Slabo 27px", serif;
+    margin: 0;
+    margin-bottom: 18px;
+}
+
 #headerLink {
     display: inline-block;
     margin: 0;
@@ -126,10 +132,11 @@ select {
 
 .dualPanes {
     width: 48%;
+    vertical-align: top;
 }
 
 #errorPane {
-    color: #bb2222;
+    color: #b71c1c;
     font-weight: bold;
 }
 
@@ -156,6 +163,52 @@ select {
 
 #theSummonerLevel {
     font-size: 16px;
+}
+
+#rightPaneContainer {
+    display: block;
+    width: 90%;
+    margin: 4px auto;
+}
+
+#rightPaneContainer h2 {
+    text-align: left;
+}
+
+.gameBlock {
+    display: block;
+    height: 124px;
+    width: 100%;
+    margin: 12px auto;
+    padding: 12px;
+    box-sizing: border-box;
+    background-color: #d4d4d4;
+    box-shadow: 0 1px 5px 1px #a4a4a4;
+}
+
+.gbUpper, .gbLower {
+    display: block;
+    text-align: left;
+    width: 100%;
+}
+
+.championLarge {
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+    vertical-align: middle;
+    box-shadow: 0 1px 3px #222;
+}
+
+.gameOutcome {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0 14px;
+    padding: 3px 8px;
+    font-family: "Slabo 27px", serif;
+    font-weight: bold;
+    font-size: 22px;
+    border-radius: 5px;
 }
 
 #footer {

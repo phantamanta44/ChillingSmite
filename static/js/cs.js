@@ -19,7 +19,7 @@ $(document).ready(function() {
         qServ: $('#inputServ'),
         paneError: $('#errorPane'),
         paneLeft: $('#leftPane'),
-        paneRight: $('#rightPane'),
+        paneRight: $('#rightPaneContainer'),
         sIcon: $('#profileIcon'),
         sStats: $('#summonerStats'),
         sName: $('#theSummonerName'),
@@ -68,18 +68,21 @@ $(document).ready(function() {
     };
     
     var Endpoint = {
-        summonerByName: {serv: true, vers: 'v1.4', ept: 'summoner/by-name'},
-        statsBySummoner: {serv: true, vers: 'v1.3', ept: 'stats/by-summoner'}
+        summonerByName: {vers: 'v1.4', url: 'https://{serv}.api.pvp.net/api/lol/{serv}/{vers}/summoner/by-name/{params}'},
+        statsBySummoner: {vers: 'v1.3', url: 'https://{serv}.api.pvp.net/api/lol/{serv}/{vers}/stats/by-summoner/{params}/summary'},
+        gamesBySummoner: {vers: 'v1.3', url: 'https://{serv}.api.pvp.net/api/lol/{serv}/{vers}/game/by-summoner/{params}/recent'},
+        champion: {vers: 'v1.2', url: 'https://global.api.pvp.net/api/lol/static-data/{serv}/{vers}/champion/{params}'}
     };
-    var baseRequest = 'https://{serv}.api.pvp.net/api/lol/{servSpec}{vers}/{ept}/{params}?api_key={cache}';
+    var baseRequest = '{req}?api_key={cache}';
     
     var requestFromApi = function(serv, ept, params, cb) {
-        var request = baseRequest.supplant({serv: serv, servSpec: ept.serv ? serv + '/' : '', vers: ept.vers, ept: ept.ept, params: params, cache: getCachedData()});
+        var request = baseRequest.supplant({req: ept.url.supplant({serv: serv, vers: ept.vers, params: params}), cache: getCachedData()});
         requestXml(request, cb);
     };
     
     var DDPoint = {
-        summonerIcon: {ept: 'img/profileicon', staticReq: false}
+        summonerIcon: {ept: 'img/profileicon', staticReq: false},
+        championIcon: {ept: 'img/champion', staticReq: false}
     };
     var baseDataDragon = 'https://ddragon.leagueoflegends.com/cdn/{vers}/{ept}/{params}';
     var baseDataDragonStatic = 'http://ddragon.leagueoflegends.com/cdn/{ept}/{params}';
@@ -99,7 +102,8 @@ $(document).ready(function() {
         var request = baseAcsRequest.supplant({vers: acsVers, serv: acsServers[serv], gid: game});
         requestXml(request, cb, true);
     };
-    
+
+    var data;
     var errorText = 'Error: {code} {reason}';
     var levelText = 'Level {lvl}';
     
@@ -110,7 +114,7 @@ $(document).ready(function() {
             Controls.paneError.text('Summoner not found!');
         }
         else {
-            var data = JSON.parse(rawJson)[query.n.toLowerCase().replace(/\s/g, '')];
+            data = JSON.parse(rawJson)[query.n.toLowerCase().replace(/\s/g, '')];
             if (data.status && data.status.status_code.startsWith(/[45]/)) {
                 Controls.paneLeft.remove();
                 Controls.paneRight.remove();
@@ -118,7 +122,8 @@ $(document).ready(function() {
                 return;
             }
             Controls.paneError.remove();
-            var stats = requestFromApi(query.s, Endpoint.statsBySummoner, data.id + '/summary', updateStats)
+            requestFromApi(query.s, Endpoint.statsBySummoner, data.id, updateStats);
+            requestFromApi(query.s, Endpoint.gamesBySummoner, data.id, updateGames);
             Controls.sIcon.attr('src', requestFromDd(DDPoint.summonerIcon, data.profileIconId + '.png'));
             Controls.sName.text(data.name);
             Controls.sLevel.text(levelText.supplant({lvl: data.summonerLevel}));
@@ -130,7 +135,78 @@ $(document).ready(function() {
             // Error handling
         }
         else {
-            var stats = JSON.parse(rawJson);
+            var stats = JSON.parse(rawJson).playerStatSummaries;
+        }
+    };
+    
+    var gameBlock = '<div class="gameBlock" id="gameBlock{gid}"></div>';
+    var gameData = [];
+    
+    var appendGameData = function(wGame) {
+        return function(rawJson) {
+            var game = JSON.parse(rawJson);
+            gameData.push(game);
+            mergeSort(gameData, function(a, b) {
+                return b.gameCreation - a.gameCreation;
+            });
+            var ind = gameData.indexOf(game) + 1;
+            if (ind >= gameData.length) {
+                Controls.paneRight.append(gameBlock.supplant({gid: game.gameId}));
+                constructGameBlock(game, wGame);
+            }
+            else {
+                $('#gameBlock' + gameData[ind].gameId).before(gameBlock.supplant({gid: game.gameId}));
+                constructGameBlock(game, wGame);
+            }
+        }
+    };
+    
+    var gbContent = '<div class="gbUpper">{upper}</div><div class="gbLower">{lower}</div>';
+    var gbUpper = '<img class="championLarge"/><div class="gameOutcome">{outcome}</div>';
+    var gbLower = '';
+    
+    var constructGameBlock = function(game, wGame) {
+        var block = $('#gameBlock' + game.gameId);
+        var players = {};
+        var rPlayersCopy = game.participants;
+        var wPlayers = wGame.fellowPlayers;
+        for (var i = 0; i < wPlayers.length; i++) {
+            var wPlayer = wPlayers[i];
+            var team = wPlayer.teamId, champ = wPlayer.championId;
+            for (var j = 0; j < game.participants.length; j++) {
+                var rPlayer = game.participants[j];
+                if (rPlayer.teamId === team && rPlayer.championId === champ) {
+                    players[wPlayer.summonerId] = rPlayer;
+                    rPlayersCopy.splice(rPlayersCopy.indexOf(rPlayer), 1);
+                    break;
+                }
+            }
+        }
+        thePlayer = players[data.id] = rPlayersCopy[0];
+        
+        var won = wGame.stats.win;
+        var upperCont = gbUpper.supplant({outcome: won ? 'VICTORY' : 'DEFEAT'});
+        
+        var lowerCont = gbLower.supplant({});
+        
+        block.html(gbContent.supplant({upper: upperCont, lower: lowerCont}));
+        
+        block.find('.gameOutcome').css('background-color', won ? '#81c784' : '#e57373');
+        
+        requestFromApi(query.s, Endpoint.champion, thePlayer.championId, function(rj1) {
+            var j1 = JSON.parse(rj1);
+            block.find('.championLarge').attr('src', requestFromDd(DDPoint.championIcon, j1.key + '.png'));
+        });
+    };
+    
+    var updateGames = function(rawJson) {
+        if (!rawJson) {
+            // Error handling
+        }
+        else {
+            var games = JSON.parse(rawJson).games;
+            for (var i = 0; i < games.length; i++)
+                requestFromAcs(query.s, games[i].gameId, appendGameData(games[i]));
         }
     };
     
