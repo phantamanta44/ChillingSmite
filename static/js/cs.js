@@ -55,7 +55,7 @@ $(document).ready(function() {
         return cache.replace(/\+/g, '-').toLowerCase();
     };
     
-    var requestXml = function(url, cb) {
+    var requestXml = function(url, cb, useProxy) {
         var req = new XMLHttpRequest(), reqData;
         req.addEventListener('load', function() {
             if (req.status === 200)
@@ -63,7 +63,7 @@ $(document).ready(function() {
             else
                 cb.call(false);
         });
-        req.open('GET', url);
+        req.open('GET', useProxy ? 'http://cors.io/?u=' + url : url);
         req.send();
     };
     
@@ -96,8 +96,8 @@ $(document).ready(function() {
     var acsServers = {na: 'NA1', euw: 'EUW1', br: 'BR1', eune: 'EUN1', lan: 'LA1', las: 'LA2', tr: 'TR1', oce: 'OC1', ru: 'RU', kr: 'KR'};
     
     var requestFromAcs = function(serv, game, cb) {
-        var url = baseAcsRequest.supplant({vers: acsVers, serv: acsServers[serv], gid: game});
-        requestXml(request, cb);
+        var request = baseAcsRequest.supplant({vers: acsVers, serv: acsServers[serv], gid: game});
+        requestXml(request, cb, true);
     };
     
     var errorText = 'Error: {code} {reason}';
