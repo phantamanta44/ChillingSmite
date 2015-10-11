@@ -21,7 +21,9 @@ $(document).ready(function() {
         paneLeft: $('#leftPane'),
         paneRight: $('#rightPane'),
         sIcon: $('#profileIcon'),
-        sName: $('#theSummonerName')
+        sStats: $('#summonerStats'),
+        sName: $('#theSummonerName'),
+        sLevel: $('#theSummonerLevel')
     };
     
     var query;
@@ -66,7 +68,8 @@ $(document).ready(function() {
     };
     
     var Endpoint = {
-        summonerByName: {serv: true, vers: 'v1.4', ept: 'summoner/by-name'}
+        summonerByName: {serv: true, vers: 'v1.4', ept: 'summoner/by-name'},
+        statsBySummoner: {serv: true, vers: 'v1.3', ept: 'stats/by-summoner'}
     };
     var baseRequest = 'https://{serv}.api.pvp.net/api/lol/{servSpec}{vers}/{ept}/{params}?api_key={cache}';
     
@@ -88,6 +91,18 @@ $(document).ready(function() {
         return request;
     };
     
+    var baseAcsRequest = 'https://acs.leagueoflegends.com/{vers}/stats/game/{serv}/{gid}';
+    var acsVers = 'v1';
+    var acsServers = {na: 'NA1', euw: 'EUW1', br: 'BR1', eune: 'EUN1', lan: 'LA1', las: 'LA2', tr: 'TR1', oce: 'OC1', ru: 'RU', kr: 'KR'};
+    
+    var requestFromAcs = function(serv, game, cb) {
+        var url = baseAcsRequest.supplant({vers: acsVers, serv: acsServers[serv], gid: game});
+        requestXml(request, cb);
+    };
+    
+    var errorText = 'Error: {code} {reason}';
+    var levelText = 'Level {lvl}';
+    
     var updatePage = function(rawJson) {
         if (!rawJson) {
             Controls.paneLeft.remove();
@@ -95,16 +110,35 @@ $(document).ready(function() {
             Controls.paneError.text('Summoner not found!');
         }
         else {
-            Controls.paneError.remove();
             var data = JSON.parse(rawJson)[query.n.toLowerCase().replace(/\s/g, '')];
+            if (data.status && data.status.status_code.startsWith(/[45]/)) {
+                Controls.paneLeft.remove();
+                Controls.paneRight.remove();
+                Controls.paneError.text(errorText.supplant({code: data.status.status_code, reason: data.status.message}));
+                return;
+            }
+            Controls.paneError.remove();
+            var stats = requestFromApi(query.s, Endpoint.statsBySummoner, data.id + '/summary', updateStats)
             Controls.sIcon.attr('src', requestFromDd(DDPoint.summonerIcon, data.profileIconId + '.png'));
             Controls.sName.text(data.name);
+            Controls.sLevel.text(levelText.supplant({lvl: data.summonerLevel}));
         }
     };
     
+    var updateStats = function(rawJson) {
+        if (!rawJson) {
+            // Error handling
+        }
+        else {
+            var stats = JSON.parse(rawJson);
+        }
+    };
+    
+    var queryTemplate = '?n={name}&s={serv}';
+    
     Controls.qSubmit.click(function(e) {
         if (Controls.qName.val())
-            window.location = '?n=' + Controls.qName.val() + '&s=' + Controls.qServ.val();
+            window.location = queryTemplate.supplant({name: Controls.qName.val(), serv: Controls.qServ.val()});
     }); 
     
     Controls.qName.keydown(function(e) {
