@@ -163,7 +163,7 @@ $(document).ready(function() {
     
     var gbContent = '<div class="gbUpper">{upper}</div><div class="gbLower">{lower}</div>';
     var gbUpper = '<div class="gbUpperLeft"><img class="championLarge"/><div class="gameOutcome">{outcome}</div></div>';
-    var gbLower = '<div class="gbLowerLeft"><div class="gameTime">{gameTime}</div><div class="gameType">{gameMode}</div></div>';
+    var gbLower = '<div class="gbLowerLeft"><div class="gameTime"><p>{gameTime}</p><p>{gameDate}</p></div><div class="gameType">{gameMode}</div></div>';
     var gameTypes = {
         NONE: 'Custom Match', NORMAL: 'Blind Pick 5v5', NORMAL_3x3: 'Blind Pick 3v3', ODIN_UNRANKED: 'Blind Pick Dominion', ARAM_UNRANKED_5x5: 'Blind Pick ARAM',
         BOT: 'Botmatch 5v5', BOT_3x3: 'Botmatch 3v3', RANKED_SOLO_5x5: 'Solo Queue 5v5', RANKED_TEAM_3x3: 'Team Match 3v3', RANKED_TEAM_5x5: 'Team Match 5v5',
@@ -196,7 +196,8 @@ $(document).ready(function() {
         
         var modSec = game.gameDuration % 60;
         var gameTime = '{min}:{sec}'.supplant({min: (game.gameDuration - modSec) / 60, sec: modSec < 10 ? '0' + modSec : modSec});
-        var lowerCont = gbLower.supplant({gameTime: gameTime, gameMode: gameTypes[wGame.subType]});
+        var gameDate = new Date(game.gameCreation).toDateString().slice(3);
+        var lowerCont = gbLower.supplant({gameTime: gameTime, gameDate: gameDate, gameMode: gameTypes[wGame.subType]});
         
         block.html(gbContent.supplant({upper: upperCont, lower: lowerCont}));
         

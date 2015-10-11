@@ -116,7 +116,7 @@ select {
     margin: 0;
 }
 
-.dualPanes, .fullPane {
+.dualPanes, .fullPane, .umPane {
     display: inline-block;
     width: 97.2%;
     margin: 0 0.5%;
@@ -126,7 +126,7 @@ select {
     transition: border-bottom-color 0.6s;
 }
 
-.fullPane:hover, .dualPanes:hover {
+.fullPane:hover, .dualPanes:hover, .umPane:hover {
     border-bottom-color: #b1b1b1;
 }
 
@@ -135,9 +135,22 @@ select {
     vertical-align: top;
 }
 
+.umPane {
+    display: block;
+    margin: 0;
+    margin-bottom: 16px;
+    width: 100%;
+}
+
 #errorPane {
     color: #b71c1c;
     font-weight: bold;
+}
+
+#leftPane {
+    background: none;
+    border: none;
+    padding: 0;
 }
 
 .summonerIcon {
@@ -179,7 +192,7 @@ select {
     display: block;
     height: 124px;
     width: 100%;
-    margin: 12px auto;
+    margin: 14px auto;
     padding: 12px;
     box-sizing: border-box;
     background-color: #d4d4d4;
@@ -227,6 +240,17 @@ select {
 
 .gameTime, .gameType {
     height: 24px;
+}
+
+.gameTime p {
+    display: inline-block;
+    margin: 0;
+    margin-right: 5px;
+}
+
+.gameTime p:last-child::before {
+    content: "|";
+    color: #8d8d8d;
 }
 
 #footer {
