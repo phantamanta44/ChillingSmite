@@ -22,6 +22,12 @@ h2 {
     margin-bottom: 18px;
 }
 
+.pipeBreak {
+    display: inline-block;
+    margin: 0 5px;
+    color: #8d8d8d;
+}
+
 #headerLink {
     display: inline-block;
     margin: 0;
@@ -231,9 +237,11 @@ select {
     font-weight: bold;
     font-size: 22px;
     border-radius: 5px;
+    box-shadow: 0 1px 6px 0 #8d8d8d;
 }
 
 .gbLowerLeft {
+    width: 178px;
     height: 100%;
     font-size: 16px;
 }
@@ -245,12 +253,6 @@ select {
 .gameTime p {
     display: inline-block;
     margin: 0;
-    margin-right: 5px;
-}
-
-.gameTime p:last-child::before {
-    content: "|";
-    color: #8d8d8d;
 }
 
 #footer {

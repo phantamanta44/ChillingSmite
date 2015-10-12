@@ -163,7 +163,7 @@ $(document).ready(function() {
     
     var gbContent = '<div class="gbUpper">{upper}</div><div class="gbLower">{lower}</div>';
     var gbUpper = '<div class="gbUpperLeft"><img class="championLarge"/><div class="gameOutcome">{outcome}</div></div>';
-    var gbLower = '<div class="gbLowerLeft"><div class="gameTime"><p>{gameTime}</p><p>{gameDate}</p></div><div class="gameType">{gameMode}</div></div>';
+    var gbLower = '<div class="gbLowerLeft"><div class="gameTime"><p>{gameTime}</p><div class="pipeBreak">|</div><p>{gameDate}</p></div><div class="gameType">{gameMode}</div></div>';
     var gameTypes = {
         NONE: 'Custom Match', NORMAL: 'Blind Pick 5v5', NORMAL_3x3: 'Blind Pick 3v3', ODIN_UNRANKED: 'Blind Pick Dominion', ARAM_UNRANKED_5x5: 'Blind Pick ARAM',
         BOT: 'Botmatch 5v5', BOT_3x3: 'Botmatch 3v3', RANKED_SOLO_5x5: 'Solo Queue 5v5', RANKED_TEAM_3x3: 'Team Match 3v3', RANKED_TEAM_5x5: 'Team Match 5v5',
