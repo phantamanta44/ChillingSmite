@@ -212,6 +212,10 @@ select {
     width: 100%;
 }
 
+.gbUpper div, .gbLower div {
+    display: inline-block;
+}
+
 .gbUpper {
     margin-bottom: 4px;
 }
@@ -238,6 +242,23 @@ select {
     font-size: 22px;
     border-radius: 5px;
     box-shadow: 0 1px 6px 0 #8d8d8d;
+}
+
+.gbUpperRight {
+    margin-left: 24px;
+}
+
+.summonerSpells {
+    margin-right: 18px;
+}
+
+.summonerSpells img, .gameItems img {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    margin: 0 4px;
+    vertical-align: middle;
+    box-shadow: 0 1px 3px #222;
 }
 
 .gbLowerLeft {

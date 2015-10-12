@@ -71,7 +71,8 @@ $(document).ready(function() {
         summonerByName: {vers: 'v1.4', url: 'https://{serv}.api.pvp.net/api/lol/{serv}/{vers}/summoner/by-name/{params}'},
         statsBySummoner: {vers: 'v1.3', url: 'https://{serv}.api.pvp.net/api/lol/{serv}/{vers}/stats/by-summoner/{params}/summary'},
         gamesBySummoner: {vers: 'v1.3', url: 'https://{serv}.api.pvp.net/api/lol/{serv}/{vers}/game/by-summoner/{params}/recent'},
-        champion: {vers: 'v1.2', url: 'https://global.api.pvp.net/api/lol/static-data/{serv}/{vers}/champion/{params}'}
+        champion: {vers: 'v1.2', url: 'https://global.api.pvp.net/api/lol/static-data/{serv}/{vers}/champion/{params}'},
+        spell: {vers: 'v1.2', url: 'https://global.api.pvp.net/api/lol/static-data/{serv}/{vers}/summoner-spell/{params}'}
     };
     var baseRequest = '{req}?api_key={cache}';
     
@@ -82,7 +83,9 @@ $(document).ready(function() {
     
     var DDPoint = {
         summonerIcon: {ept: 'img/profileicon', staticReq: false},
-        championIcon: {ept: 'img/champion', staticReq: false}
+        championIcon: {ept: 'img/champion', staticReq: false},
+        itemIcon: {ept: 'img/item', staticReq: false},
+        spellIcon: {ept: 'img/spell', staticReq: false}
     };
     var baseDataDragon = 'https://ddragon.leagueoflegends.com/cdn/{vers}/{ept}/{params}';
     var baseDataDragonStatic = 'http://ddragon.leagueoflegends.com/cdn/{ept}/{params}';
@@ -162,8 +165,10 @@ $(document).ready(function() {
     };
     
     var gbContent = '<div class="gbUpper">{upper}</div><div class="gbLower">{lower}</div>';
-    var gbUpper = '<div class="gbUpperLeft"><img class="championLarge"/><div class="gameOutcome">{outcome}</div></div>';
-    var gbLower = '<div class="gbLowerLeft"><div class="gameTime"><p>{gameTime}</p><div class="pipeBreak">|</div><p>{gameDate}</p></div><div class="gameType">{gameMode}</div></div>';
+    var gbUpper = '<div class="gbUpperLeft"><img class="championLarge"/><div class="gameOutcome">{outcome}</div></div>\
+        <div class="gbUpperRight"><div class="summonerSpells"></div><div class="gameItems"></div></div>';
+    var gbLower = '<div class="gbLowerLeft"><div class="gameTime"><p>{gameTime}</p><div class="pipeBreak">|</div><p>{gameDate}</p></div><div class="gameType">{gameMode}</div></div>\
+        <div class="gbLowerRight"></div>';
     var gameTypes = {
         NONE: 'Custom Match', NORMAL: 'Blind Pick 5v5', NORMAL_3x3: 'Blind Pick 3v3', ODIN_UNRANKED: 'Blind Pick Dominion', ARAM_UNRANKED_5x5: 'Blind Pick ARAM',
         BOT: 'Botmatch 5v5', BOT_3x3: 'Botmatch 3v3', RANKED_SOLO_5x5: 'Solo Queue 5v5', RANKED_TEAM_3x3: 'Team Match 3v3', RANKED_TEAM_5x5: 'Team Match 5v5',
@@ -213,6 +218,23 @@ $(document).ready(function() {
             var j1 = JSON.parse(rj1);
             block.find('.championLarge').attr('src', requestFromDd(DDPoint.championIcon, j1.key + '.png'));
         });
+        requestFromApi(query.s, Endpoint.spell, thePlayer.spell1Id, function(rj2) {
+            var j2 = JSON.parse(rj2);
+            block.find('.summonerSpells').prepend($('<img>', {src: requestFromDd(DDPoint.spellIcon, j2.key + '.png')}));
+        });
+        requestFromApi(query.s, Endpoint.spell, thePlayer.spell2Id, function(rj3) {
+            var j3 = JSON.parse(rj3);
+            block.find('.summonerSpells').append($('<img>', {src: requestFromDd(DDPoint.spellIcon, j3.key + '.png')}));
+        });
+        for (var itemInd = 0; itemInd < 7; itemInd++) {
+            var itemId = thePlayer.stats['item' + itemInd];
+            if (itemId !== 0)
+                block.find('.gameItems').append($('<img>', {src: requestFromDd(DDPoint.itemIcon, itemId + '.png')}));
+            else if (itemInd === 6)
+                block.find('.gameItems').append($('<img>', {src: 'static/img/noTrinket.png'}));
+            else
+                block.find('.gameItems').append($('<img>', {src: 'static/img/noItem.png'}));
+        }
     };
     
     var updateGames = function(rawJson) {
