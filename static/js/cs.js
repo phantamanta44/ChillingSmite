@@ -47,7 +47,7 @@ $(document).ready(function() {
         cache = cacheNode.attr('title');
         cacheNode.remove();
         cache = hexToBase64(cache);
-    }
+    };
     
     var getCachedData = function() {
         if (!cache)
@@ -161,7 +161,7 @@ $(document).ready(function() {
                 $('#gameBlock' + gameData[ind].gameId).before(gameBlock.supplant({gid: game.gameId}));
                 constructGameBlock(game, wGame);
             }
-        }
+        };
     };
     
     var gbContent = '<div class="gbUpper">{upper}</div><div class="gbLower">{lower}</div>';
@@ -269,7 +269,7 @@ $(document).ready(function() {
         $('#qForm').prepend(headerText.supplant({loc: document.location.host + document.location.pathname}));
         Controls.qName.val(query.n);
         Controls.qServ.val(query.s);
-        var data = requestFromApi(query.s, Endpoint.summonerByName, query.n, updatePage);
+        requestFromApi(query.s, Endpoint.summonerByName, query.n, updatePage);
     }
     
 });
