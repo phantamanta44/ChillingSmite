@@ -31,7 +31,7 @@ h2 {
 #headerLink {
     display: inline-block;
     margin: 0;
-    margin-right: 48px;
+    margin-right: 4%;
     font-family: "Lobster", sans-serif;
     font-size: 42px;
     color: #2a2a2a;
@@ -58,7 +58,7 @@ a:hover {
 
 input[type="text"], select, #submit {
     display: inline-block;
-    width: 420px;
+    width: 32%;
     height: 52px;
     margin: 0 2px;
     padding: 12px 18px;
@@ -80,7 +80,7 @@ input[type="text"]:hover, input[type="text"]:focus, select:hover, select:focus, 
 }
 
 select {
-    width: 212px;
+    width: 16%;
     background-image: url("../img/more.png");
     background-repeat: no-repeat;
     background-position: right;
@@ -212,63 +212,91 @@ select {
     width: 100%;
 }
 
-.gbUpper div, .gbLower div {
+.gbUpper > div, .gbLower > div {
     display: inline-block;
+    height: 100%;
+    line-height: 100%;
 }
 
 .gbUpper {
-    margin-bottom: 4px;
+    margin-bottom: 8px;
 }
 
 .gbUpperLeft {
-    width: 178px;
+    width: 32%;
 }
 
 .championLarge {
     display: inline-block;
-    width: 48px;
-    height: 48px;
+    width: 26%;
+    max-width: 48px;
     vertical-align: middle;
     box-shadow: 0 1px 3px #222;
 }
 
 .gameOutcome {
     display: inline-block;
+    width: 46%;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
     vertical-align: middle;
-    margin: 0 14px;
-    padding: 3px 8px;
-    font-family: "Slabo 27px", serif;
+    margin: 0 7%;
+    padding: 3px 3.6%;
     font-weight: bold;
-    font-size: 22px;
+    font-family: "Slabo 27px", serif;
+    font-size: 1.4vw;
     border-radius: 5px;
     box-shadow: 0 1px 6px 0 #8d8d8d;
+
+}
+.gbUpperRight {
+    width: 62%;
+    margin-left: 2%;
 }
 
-.gbUpperRight {
-    margin-left: 24px;
+.summonerSpells, .gameItems {
+    display: inline-block;
+    vertical-align: middle;
+    margin: auto 0;
 }
 
 .summonerSpells {
-    margin-right: 18px;
+    width: 22%;
+    margin-right: 2%;
+}
+
+.gameItems {
+    width: 76%;
 }
 
 .summonerSpells img, .gameItems img {
     display: inline-block;
-    width: 40px;
-    height: 40px;
-    margin: 0 4px;
+    width: 40.1%;
+    max-width: 48px;
+    margin: auto 4.2%;
     vertical-align: middle;
     box-shadow: 0 1px 3px #222;
 }
 
+.gameItems img {
+    width: 11.6%;
+    margin: auto 0.92%;
+}
+
+.gbLower > div {
+    vertical-align: top;
+}
+
 .gbLowerLeft {
-    width: 178px;
-    height: 100%;
+    width: 35%;
     font-size: 16px;
 }
 
 .gameTime, .gameType {
     height: 24px;
+    line-height: 24px;
+    font-size: 1vw;
 }
 
 .gameTime p {
