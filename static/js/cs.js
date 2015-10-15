@@ -14,6 +14,7 @@ $(document).ready(function() {
     }
     
     var Controls = {
+        doc: $(document),
         qSubmit: $('#submit'),
         qName: $('#inputName'),
         qServ: $('#inputServ'),
@@ -23,7 +24,8 @@ $(document).ready(function() {
         sIcon: $('#profileIcon'),
         sStats: $('#summonerStats'),
         sName: $('#theSummonerName'),
-        sLevel: $('#theSummonerLevel')
+        sLevel: $('#theSummonerLevel'),
+        tooltip: $('#tooltip')
     };
     
     var query;
@@ -72,7 +74,8 @@ $(document).ready(function() {
         statsBySummoner: {vers: 'v1.3', url: 'https://{serv}.api.pvp.net/api/lol/{serv}/{vers}/stats/by-summoner/{params}/summary'},
         gamesBySummoner: {vers: 'v1.3', url: 'https://{serv}.api.pvp.net/api/lol/{serv}/{vers}/game/by-summoner/{params}/recent'},
         champion: {vers: 'v1.2', url: 'https://global.api.pvp.net/api/lol/static-data/{serv}/{vers}/champion/{params}'},
-        spell: {vers: 'v1.2', url: 'https://global.api.pvp.net/api/lol/static-data/{serv}/{vers}/summoner-spell/{params}'}
+        spell: {vers: 'v1.2', url: 'https://global.api.pvp.net/api/lol/static-data/{serv}/{vers}/summoner-spell/{params}'},
+        item: {vers: 'v1.2', url: 'https://global.api.pvp.net/api/lol/static-data/{serv}/{vers}/item/{params}'}
     };
     var baseRequest = '{req}?api_key={cache}';
     
@@ -228,13 +231,38 @@ $(document).ready(function() {
         });
         for (var itemInd = 0; itemInd < 7; itemInd++) {
             var itemId = thePlayer.stats['item' + itemInd];
-            if (itemId !== 0)
-                block.find('.gameItems').append($('<img>', {src: requestFromDd(DDPoint.itemIcon, itemId + '.png')}));
+            if (itemId !== 0) {
+                var itemBlock = $('<img>', {src: requestFromDd(DDPoint.itemIcon, itemId + '.png')});
+                block.find('.gameItems').append(itemBlock);
+                requestFromApi(query.s, Endpoint.item, itemId, constructItemTooltip(itemBlock));
+            }
             else if (itemInd === 6)
                 block.find('.gameItems').append($('<img>', {src: 'static/img/noTrinket.png'}));
             else
                 block.find('.gameItems').append($('<img>', {src: 'static/img/noItem.png'}));
         }
+    };
+    
+    var itemDescHtml = '<div class="itemName">{name}</div><div class="itemDesc">{desc}</div>';
+    
+    var constructItemTooltip = function(block) {
+        return function(rawJson) {
+            var item = JSON.parse(rawJson);
+            var iDesc = item.description.replace(/BBFFFF/g, '00bcd4');
+            block.mouseover(function() {
+                Controls.tooltip.css('display', 'block');
+                Controls.tooltip.html(itemDescHtml.supplant({name: item.name, desc: iDesc}));
+            });
+            block.mouseout(function() {
+                Controls.tooltip.css('display', 'none');
+            });
+            block.mousemove(function(e) {
+                if (e.clientX + Controls.tooltip.width() <= Controls.doc.width())
+                    Controls.tooltip.css({top: (e.clientY + 4) + 'px', left: (e.clientX + 4) + 'px'});
+                else
+                    Controls.tooltip.css({top: (e.clientY + 4) + 'px', left: (e.clientX - (Controls.tooltip.width() + 4)) + 'px'});
+            });
+        };
     };
     
     var updateGames = function(rawJson) {
