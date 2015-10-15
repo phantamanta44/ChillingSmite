@@ -257,10 +257,13 @@ $(document).ready(function() {
                 Controls.tooltip.css('display', 'none');
             });
             block.mousemove(function(e) {
-                if (e.clientX + Controls.tooltip.width() <= Controls.doc.width())
-                    Controls.tooltip.css({top: (e.clientY + 4) + 'px', left: (e.clientX + 4) + 'px'});
-                else
-                    Controls.tooltip.css({top: (e.clientY + 4) + 'px', left: (e.clientX - (Controls.tooltip.width() + 4)) + 'px'});
+                var posX = e.clientX + 8;
+                var posY = e.clientY + 8;
+                if (e.clientX + Controls.tooltip.innerWidth() > window.innerWidth)
+                    posX = e.clientX - Controls.tooltip.innerWidth() - 4;
+                if (e.clientY + Controls.tooltip.innerHeight() > window.innerHeight)
+                    posY = e.clientY - Controls.tooltip.innerHeight() - 4;
+                Controls.tooltip.css({top: posY + 'px', left: posX + 'px'});
             });
         };
     };
