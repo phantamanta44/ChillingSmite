@@ -176,7 +176,7 @@ $(document).ready(function() {
         };
     };
     
-    var gbContent = '<div class="gbUpper">{upper}</div><div class="gbLower">{lower}</div>';
+    var gbContent = '<div class="gbUpper">{upper}</div><div class="gbLower">{lower}</div><div class="detailsBtn"><i class="fa fa-ellipsis-h"></i></div>';
     var gbUpper = '<div class="gbUpperLeft"><img class="championLarge"/><div class="gameOutcome">{outcome}</div></div>\
         <div class="gbUpperRight"><div class="summonerSpells"></div><div class="gameItems"></div></div>';
     var gbLower = '<div class="gbLowerLeft"><div class="gameTime"><p>{gameTime}</p><div class="pipeBreak">|</div><p>{gameDate}</p></div><div class="gameType">{gameMode}</div></div>\
@@ -193,6 +193,7 @@ $(document).ready(function() {
         URF: 'Ultra Rapid Fire', URF_BOT: 'URF Botmatch', NIGHTMARE_BOT: 'Nightmare Botmatch', ASCENSION: 'Ascension', HEXAKILL: 'Hexakill 3v3',
         KING_PORO: 'King Poro', COUNTER_PICK: 'Nemesis', BILGEWATER: 'Black Market Brawlers'
     };
+    var gameUrl = 'game.html?g={gid}&s={serv}';
     
     var constructGameBlock = function(game, wGame) {
         var block = $('#gameBlock' + game.gameId);
@@ -264,6 +265,19 @@ $(document).ready(function() {
             else
                 block.find('.gameItems').append($('<img>', {src: 'static/img/noItem.png'}));
         }
+        
+        var detailsBtn = block.find('.detailsBtn');
+        detailsBtn.click(function() {
+            document.location = gameUrl.supplant({gid: game.gameId, serv: query.s});
+        });
+        block.mouseenter(function(e) {
+            detailsBtn.stop();
+            detailsBtn.animate({width: '48px', height: '48px', 'font-size': '22px'}, 300);
+        });
+        block.mouseleave(function(e) {
+            detailsBtn.stop();
+            detailsBtn.animate({width: 0, height: 0, 'font-size': 0}, 300);
+        });
     };
     
     var itemDescHtml = '<div class="itemName">{name}</div><div class="itemDesc">{desc}</div>';

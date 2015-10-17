@@ -5,17 +5,14 @@
         <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Lobster">
         <link href='https://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-        <link rel="stylesheet" type="text/css" href="static/css/main.css">
+        <link rel="stylesheet" type="text/css" href="static/css/game.css">
         <script src="static/js/jquery-2.1.4.min.js"></script>
         <script src="static/js/merge-sort.js"></script>
         <script src="static/js/b64.js"></script>
-        <script src="static/js/cs.js"></script>
+        <script src="static/js/game.js"></script>
         <title>Chilling Smite</title>
     </head>
     <body>
-        <div id="firstpage" class="page">
-            <h1>Chilling Smite</h1>
-        </div>
         <div id="nodeCache" title="e5cefd178d76fb97f56bee3c783fbcd5bdfef38d38f37dfbd75dc1"></div>
         <div id="qForm">
                 <input type="text" id="inputName" placeholder="Summoner Name">
@@ -33,26 +30,15 @@
                 </select>
                 <button id="submit"><i class="fa fa-search"></i></button>
             </div>
-        <div id="secondpage" class="page">
-            <div id="errorPane" class="fullPane"></div>
-            <div id="leftPane" class="dualPanes">
-                <div id="leftPaneTop" class="umPane">
-                    <img id="profileIcon" class="summonerIcon"/>
-                    <div id="summonerStats">
-                        <div id="theSummonerName"></div>
-                        <div id="theSummonerLevel"></div>
-                    </div>
-                </div>
-                <div id="leftPaneBot" class="umPane">
-                    <strong>Work-in-progress stats panel</strong><br>
-                    Lorem ipsum dolor set amet consectetur adipiscing elit sed do...
-                </div>
-            </div>
-            <div id="rightPane" class="dualPanes">
-                <div id="rightPaneContainer">
-                    <h2>Recent Games</h2>
-                </div>
-            </div>
+        <div id="errorPane" class="fullPane"></div>
+        <div id="leftPane" class="dualPanes">
+            <p>Blue Team</p>
+        </div>
+        <div id="rightPane" class="dualPanes">
+            <p>Red Team</p>
+        </div>
+        <div id="bottomPane" class="fullPane">
+            <p>Statistics</p>
         </div>
         <div id="tooltip">Lorem ipsum dolor set amet</div>
         <div id="footer">
