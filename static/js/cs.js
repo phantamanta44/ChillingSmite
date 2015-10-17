@@ -188,7 +188,7 @@ $(document).ready(function() {
     var constructGameBlock = function(game, wGame) {
         var block = $('#gameBlock' + game.gameId);
         var players = {};
-        var rPlayersCopy = game.participants;
+        var rPlayersCopy = game.participants.concat();
         var wPlayers = wGame.fellowPlayers;
         for (var i = 0; i < wPlayers.length; i++) {
             var wPlayer = wPlayers[i];
@@ -219,7 +219,7 @@ $(document).ready(function() {
         var kda = {k: wGame.stats.championsKilled || 0, d: wGame.stats.numDeaths || 0, a: wGame.stats.assists || 0};
         kda.kdr = Math.round((kda.k + kda.a) / kda.d * 100) / 100;
         kda.ratio = isNaN(kda.kdr) || kda.kdr === Infinity ? 'Perfect' : kda.kdr + ' : 1';
-        var creeps = wGame.stats.minionsKilled || 0;
+        var creeps = (wGame.stats.minionsKilled || 0) + (wGame.stats.neutralMinionsKilled || 0);
         var cpm = Math.round((creeps / game.gameDuration) * 6000) / 100;
         var gameStats = gStats.supplant({kda: kdaFormat.supplant(kda), creeps: creeps, cpm: cpm});
         var gold = wGame.stats.goldEarned;
