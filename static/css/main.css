@@ -342,6 +342,7 @@ grouplimit {
 }
 
 .gameStats {
+    display: inline-block;
     width: 50%;
 }
 
@@ -350,7 +351,8 @@ grouplimit {
     margin: 0;
 }
 
-.gameKda, .gameCsStats {
+.gameStats > div {
+    width: 100%;
     height: 24px;
     line-height: 24px;
     font-size: 1vw;
