@@ -171,7 +171,10 @@ $(document).ready(function() {
     var gbUpper = '<div class="gbUpperLeft"><img class="championLarge"/><div class="gameOutcome">{outcome}</div></div>\
         <div class="gbUpperRight"><div class="summonerSpells"></div><div class="gameItems"></div></div>';
     var gbLower = '<div class="gbLowerLeft"><div class="gameTime"><p>{gameTime}</p><div class="pipeBreak">|</div><p>{gameDate}</p></div><div class="gameType">{gameMode}</div></div>\
-        <div class="gbLowerRight"></div>';
+        <div class="gbLowerRight"><div class="gameStats">{gStats}</div></div>';
+    var gStats = '<div class="gameKda"><img class="statIcon statScore" src="static/img/score.png"/><p>{kda}</p></div>\
+        <div class="gameCsStats"><img class="statIcon statMinion" src="static/img/minion.png"/><p>{creeps}<div class="pipeBreak">|</div>{cpm} CPM</p></div>';
+    var kdaFormat = '{k} / {d} / {a}<div class="pipeBreak">|</div>{ratio}'
     var gameTypes = {
         NONE: 'Custom Match', NORMAL: 'Blind Pick 5v5', NORMAL_3x3: 'Blind Pick 3v3', ODIN_UNRANKED: 'Blind Pick Dominion', ARAM_UNRANKED_5x5: 'Blind Pick ARAM',
         BOT: 'Botmatch 5v5', BOT_3x3: 'Botmatch 3v3', RANKED_SOLO_5x5: 'Solo Queue 5v5', RANKED_TEAM_3x3: 'Team Match 3v3', RANKED_TEAM_5x5: 'Team Match 5v5',
@@ -211,7 +214,13 @@ $(document).ready(function() {
         var modSec = game.gameDuration % 60;
         var gameTime = '{min}:{sec}'.supplant({min: (game.gameDuration - modSec) / 60, sec: modSec < 10 ? '0' + modSec : modSec});
         var gameDate = new Date(game.gameCreation).toDateString().slice(3);
-        var lowerCont = gbLower.supplant({gameTime: gameTime, gameDate: gameDate, gameMode: gameTypes[wGame.subType]});
+        var kda = {k: wGame.stats.championsKilled || 0, d: wGame.stats.numDeaths || 0, a: wGame.stats.assists || 0};
+        kda.kdr = Math.round((kda.k + kda.a) / kda.d * 100) / 100;
+        kda.ratio = isNaN(kda.kdr) || kda.kdr === Infinity ? 'Perfect' : kda.kdr + ' : 1';
+        var creeps = wGame.stats.minionsKilled || 0;
+        var cpm = Math.round((creeps / game.gameDuration) * 6000) / 100;
+        var gameStats = gStats.supplant({kda: kdaFormat.supplant(kda), creeps: creeps, cpm: cpm});
+        var lowerCont = gbLower.supplant({gameTime: gameTime, gameDate: gameDate, gameMode: gameTypes[wGame.subType], gStats: gameStats});
         
         block.html(gbContent.supplant({upper: upperCont, lower: lowerCont}));
         

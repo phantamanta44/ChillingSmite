@@ -284,26 +284,6 @@ select {
     margin: auto 0.92%;
 }
 
-.gbLower > div {
-    vertical-align: top;
-}
-
-.gbLowerLeft {
-    width: 35%;
-    font-size: 16px;
-}
-
-.gameTime, .gameType {
-    height: 24px;
-    line-height: 24px;
-    font-size: 1vw;
-}
-
-.gameTime p {
-    display: inline-block;
-    margin: 0;
-}
-
 #tooltip {
     position: fixed;
     width: 256px;
@@ -334,6 +314,49 @@ unique, passive, active, aura {
 grouplimit {
     font-style: italic;
     color: #8a2b1c
+}
+
+.gbLower > div {
+    vertical-align: top;
+}
+
+.gbLowerLeft {
+    width: 35%;
+    font-size: 16px;
+}
+
+.gameTime, .gameType {
+    height: 24px;
+    line-height: 24px;
+    font-size: 1vw;
+}
+
+.gameTime p {
+    display: inline-block;
+    margin: 0;
+}
+
+.gameStats {
+    
+}
+
+.gameStats p {
+    display: inline-block;
+    margin: 0;
+}
+
+.gameKda, .gameCsStats {
+    height: 24px;
+    line-height: 24px;
+    font-size: 1vw;
+}
+
+.statIcon {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    margin-right: 6px;
+    vertical-align: middle;
 }
 
 #footer {
