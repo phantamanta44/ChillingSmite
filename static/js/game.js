@@ -163,7 +163,7 @@ $(document).ready(function() {
         };
     };
     
-    var queryTemplate = '?n={name}&s={serv}';
+    var queryTemplate = 'index.html?n={name}&s={serv}';
     
     Controls.qSubmit.click(function(e) {
         if (Controls.qName.val())
