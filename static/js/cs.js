@@ -13,6 +13,15 @@ $(document).ready(function() {
         };
     }
     
+    var avg = function(values) {
+        var average = 0, count = 0;
+        $.each(values, function (k, v) {
+            average += (v || 0);
+            count++;
+        });
+        return Math.round(100 * average / count) / 100;
+    };
+    
     var Controls = {
         doc: $(document),
         qSubmit: $('#submit'),
@@ -175,7 +184,7 @@ $(document).ready(function() {
     var gStats = '<div class="gameKda"><img class="statIcon statScore" src="static/img/score.png"/><p>{kda}</p></div>\
         <div class="gameCsStats"><img class="statIcon statMinion" src="static/img/minion.png"/><p>{creeps}<div class="pipeBreak">|</div>{cpm} CPM</p></div>';
     var kdaFormat = '{k} / {d} / {a}<div class="pipeBreak">|</div>{ratio}'
-    var gStats2 = '<div class="gameLevel"><img class="statIcon statLevel" src="static/img/champion.png"/><p>Level {level}</p></div>\
+    var gStats2 = '<div class="gameLevel"><img class="statIcon statLevel" src="static/img/champion.png"/><p>Level {level}<div class="pipeBreak">|</div>{xpm} XPM</p></div>\
         <div class="gameGold"><img class="statIcon statGold" src="static/img/gold.png"/><p>{gold}<div class="pipeBreak">|</div>{gpm} GPM</p></div>';
     var gameTypes = {
         NONE: 'Custom Match', NORMAL: 'Blind Pick 5v5', NORMAL_3x3: 'Blind Pick 3v3', ODIN_UNRANKED: 'Blind Pick Dominion', ARAM_UNRANKED_5x5: 'Blind Pick ARAM',
@@ -224,7 +233,7 @@ $(document).ready(function() {
         var gameStats = gStats.supplant({kda: kdaFormat.supplant(kda), creeps: creeps, cpm: cpm});
         var gold = wGame.stats.goldEarned;
         var gpm = Math.round((gold / game.gameDuration) * 6000) / 100;
-        var gameStats2 = gStats2.supplant({level: wGame.stats.level, gold: gold, gpm: gpm});
+        var gameStats2 = gStats2.supplant({level: wGame.stats.level, xpm: avg(thePlayer.timeline.xpPerMinDeltas), gold: gold, gpm: gpm});
         var lowerCont = gbLower.supplant({gameTime: gameTime, gameDate: gameDate, gameMode: gameTypes[wGame.subType], gStats: gameStats, gStats2: gameStats2});
         
         block.html(gbContent.supplant({upper: upperCont, lower: lowerCont}));
