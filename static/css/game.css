@@ -19,6 +19,12 @@ h2 {
     margin-bottom: 18px;
 }
 
+.centerHelper {
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+}
+
 .pipeBreak {
     display: inline-block;
     margin: 0 5px;
@@ -170,9 +176,9 @@ select {
 
 .gbRight {
     display: inline-block;
-    width: 64%;
+    width: 58%;
     height: 100%;
-    margin-left: 2%;
+    margin-left: 8%;
 }
 
 .gbUpper, .gbLower {
@@ -184,6 +190,9 @@ select {
 
 .gbUpper > div, .gbLower > div {
     display: inline-block;
+}
+
+.gbLower > div {
     height: 100%;
     line-height: 100%;
 }
@@ -224,7 +233,6 @@ select {
 .gbLower {
     vertical-align: top;
     width: 100%;
-    margin-left: 2.2%;
 }
 
 .gameStats {

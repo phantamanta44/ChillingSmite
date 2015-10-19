@@ -169,7 +169,7 @@ $(document).ready(function() {
     };
     
     var pbContent = '<img class="championLarge"/><div class="gbRight"><div class="gbUpper">{upper}</div><div class="gbLower">{lower}</div></div>';
-    var pbUpper = '<div class="gbUpperRight"><div class="summonerSpells"></div><div class="gameItems"></div></div>';
+    var pbUpper = '<div class="centerHelper"></div><div class="summonerSpells"></div><div class="gameItems"></div>';
     var pbLower = '<div class="gameStats">{gStats}</div><div class="gameStats">{gStats2}</div>';
     var pStats = '<div class="gameKda"><img class="statIcon statScore" src="static/img/score.png"/><p>{kda}</p></div>\
         <div class="gameCsStats"><img class="statIcon statMinion" src="static/img/minion.png"/><p>{creeps}<div class="pipeBreak">|</div>{cpm} CPM</p></div>';
