@@ -74,6 +74,9 @@ $(document).ready(function() {
             else
                 cb.call(false);
         });
+        req.addEventListener('error', function() {
+            cb.call(false, req.status);
+        });
         req.open('GET', useProxy ? 'http://cors.io/?u=' + url : url);
         req.send();
     };

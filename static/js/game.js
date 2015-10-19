@@ -71,6 +71,9 @@ $(document).ready(function() {
             else
                 cb.call(false);
         });
+        req.addEventListener('error', function() {
+            cb.call(false, req.status);
+        });
         req.open('GET', useProxy ? 'http://cors.io/?u=' + url : url);
         req.send();
     };
@@ -124,6 +127,19 @@ $(document).ready(function() {
         KING_PORO: 'King Poro', COUNTER_PICK: 'Nemesis', BILGEWATER: 'Black Market Brawlers'
     };
     
+    var Team = {};
+    var Players = {'100': [], '200': []};
+    
+    var parseData = function(data) {
+        console.log(data); // DELETE the underlined portion DELETE the underlined portion DELETE the underlined portion DELETE the underlined portion
+        $.each(data.teams, function(i, obj) {
+            Team[obj.teamId] = obj;
+        });
+        $.each(data.participants, function(i, obj) {
+            Players[obj.teamId].push(obj);
+        });
+    };
+    
     var updatePage = function(rawJson) {
         if (!rawJson) {
             Controls.paneLeft.remove();
@@ -134,7 +150,70 @@ $(document).ready(function() {
         else {
             data = JSON.parse(rawJson);
             Controls.paneError.remove();
-            // Update page accordingly
+            parseData(data);
+            
+            $('#blueHeader').text(Team[100].win === 'Fail' ? 'DEFEAT' : 'VICTORY');
+            $('#redHeader').text(Team[200].win === 'Fail' ? 'DEFEAT' : 'VICTORY');
+            
+            $.each(Players[100], function(i, obj) {
+                var block = $('<div>', {class: 'playerBlock'});
+                Controls.paneLeft.append(block);
+                constructPlayerBlock(block, obj, data);
+            });
+            $.each(Players[200], function(i, obj) {
+                var block = $('<div>', {class: 'playerBlock'});
+                Controls.paneRight.append(block);
+                constructPlayerBlock(block, obj, data);
+            });
+        }
+    };
+    
+    var pbContent = '<img class="championLarge"/><div class="gbRight"><div class="gbUpper">{upper}</div><div class="gbLower">{lower}</div></div>';
+    var pbUpper = '<div class="gbUpperRight"><div class="summonerSpells"></div><div class="gameItems"></div></div>';
+    var pbLower = '<div class="gameStats">{gStats}</div><div class="gameStats">{gStats2}</div>';
+    var pStats = '<div class="gameKda"><img class="statIcon statScore" src="static/img/score.png"/><p>{kda}</p></div>\
+        <div class="gameCsStats"><img class="statIcon statMinion" src="static/img/minion.png"/><p>{creeps}<div class="pipeBreak">|</div>{cpm} CPM</p></div>';
+    var kdaFormat = '{k} / {d} / {a}<div class="pipeBreak">|</div>{ratio}';
+    var pStats2 = '<div class="gameLevel"><img class="statIcon statLevel" src="static/img/champion.png"/><p>Level {level}<div class="pipeBreak">|</div>{xpm} XPM</p></div>\
+        <div class="gameGold"><img class="statIcon statGold" src="static/img/gold.png"/><p>{gold}<div class="pipeBreak">|</div>{gpm} GPM</p></div>';
+    
+    var constructPlayerBlock = function(block, player, game) {
+        var kda = {k: player.stats.kills || 0, d: player.stats.deaths || 0, a: player.stats.assists || 0};
+        kda.kdr = Math.round((kda.k + kda.a) / kda.d * 100) / 100;
+        kda.ratio = isNaN(kda.kdr) || kda.kdr === Infinity ? 'Perfect' : kda.kdr + ' : 1';
+        var creeps = player.stats.totalMinionsKilled || 0;
+        var cpm = Math.round((creeps / game.gameDuration) * 6000) / 100;
+        var gameStats = pStats.supplant({kda: kdaFormat.supplant(kda), creeps: creeps, cpm: cpm});
+        var gold = player.stats.goldEarned;
+        var gpm = Math.round((gold / game.gameDuration) * 6000) / 100;
+        var gameStats2 = pStats2.supplant({level: player.stats.champLevel, xpm: avg(player.timeline.xpPerMinDeltas), gold: gold, gpm: gpm});
+        var lowerCont = pbLower.supplant({gStats: gameStats, gStats2: gameStats2});
+        
+        block.html(pbContent.supplant({upper: pbUpper, lower: lowerCont}));
+        
+        requestFromApi(query.s, Endpoint.champion, player.championId, function(rj1) {
+            var j1 = JSON.parse(rj1);
+            block.find('.championLarge').attr('src', requestFromDd(DDPoint.championIcon, j1.key + '.png'));
+        });
+        requestFromApi(query.s, Endpoint.spell, player.spell1Id, function(rj2) {
+            var j2 = JSON.parse(rj2);
+            block.find('.summonerSpells').prepend($('<img>', {src: requestFromDd(DDPoint.spellIcon, j2.key + '.png')}));
+        });
+        requestFromApi(query.s, Endpoint.spell, player.spell2Id, function(rj3) {
+            var j3 = JSON.parse(rj3);
+            block.find('.summonerSpells').append($('<img>', {src: requestFromDd(DDPoint.spellIcon, j3.key + '.png')}));
+        });
+        for (var itemInd = 0; itemInd < 7; itemInd++) {
+            var itemId = player.stats['item' + itemInd];
+            if (itemId !== 0) {
+                var itemBlock = $('<img>', {src: requestFromDd(DDPoint.itemIcon, itemId + '.png')});
+                block.find('.gameItems').append(itemBlock);
+                requestFromApi(query.s, Endpoint.item, itemId, constructItemTooltip(itemBlock));
+            }
+            else if (itemInd === 6)
+                block.find('.gameItems').append($('<img>', {src: 'static/img/noTrinket.png'}));
+            else
+                block.find('.gameItems').append($('<img>', {src: 'static/img/noItem.png'}));
         }
     };
     
