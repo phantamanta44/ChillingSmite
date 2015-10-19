@@ -196,7 +196,7 @@ $(document).ready(function() {
         URF: 'Ultra Rapid Fire', URF_BOT: 'URF Botmatch', NIGHTMARE_BOT: 'Nightmare Botmatch', ASCENSION: 'Ascension', HEXAKILL: 'Hexakill 3v3',
         KING_PORO: 'King Poro', COUNTER_PICK: 'Nemesis', BILGEWATER: 'Black Market Brawlers'
     };
-    var gameUrl = 'game.html?g={gid}&s={serv}';
+    var gameUrl = 'game.html?g={gid}&s={serv}&t={team}&c={cid}';
     
     var constructGameBlock = function(game, wGame) {
         var block = $('#gameBlock' + game.gameId);
@@ -270,9 +270,12 @@ $(document).ready(function() {
         }
         
         var detailsBtn = block.find('.detailsBtn');
-        detailsBtn.click(function() {
-            document.location = gameUrl.supplant({gid: game.gameId, serv: query.s});
-        });
+        (function(cPlayer) {
+            detailsBtn.click(function() {
+                document.location = gameUrl.supplant({gid: game.gameId, serv: query.s, team: cPlayer.teamId, cid: cPlayer.championId});
+            });
+        })(thePlayer);
+        
         block.mouseenter(function(e) {
             detailsBtn.stop();
             detailsBtn.animate({width: '48px', height: '48px', 'font-size': '22px'}, 300);

@@ -190,6 +190,8 @@ $(document).ready(function() {
         var lowerCont = pbLower.supplant({gStats: gameStats, gStats2: gameStats2});
         
         block.html(pbContent.supplant({upper: pbUpper, lower: lowerCont}));
+        if ((query.t == player.teamId) && (query.c == player.championId))
+            block.css('background-color', '#bbdefb');
         
         requestFromApi(query.s, Endpoint.champion, player.championId, function(rj1) {
             var j1 = JSON.parse(rj1);
