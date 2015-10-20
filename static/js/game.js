@@ -128,7 +128,7 @@ $(document).ready(function() {
     };
     
     var Team = {};
-    var Players = {'100': [], '200': []};
+    var Players = {'100': [], '200': []}, Participants = {};
     
     var parseData = function(data) {
         console.log(data); // DELETE the underlined portion DELETE the underlined portion DELETE the underlined portion DELETE the underlined portion
@@ -137,6 +137,9 @@ $(document).ready(function() {
         });
         $.each(data.participants, function(i, obj) {
             Players[obj.teamId].push(obj);
+        });
+        $.each(data.participantIdentities, function(i, obj) {
+            Participants[obj.participantId] = obj;
         });
     };
     
@@ -158,17 +161,17 @@ $(document).ready(function() {
             $.each(Players[100], function(i, obj) {
                 var block = $('<div>', {class: 'playerBlock'});
                 Controls.paneLeft.append(block);
-                constructPlayerBlock(block, obj, data);
+                constructPlayerBlock(block, obj, Participants[obj.participantId], data);
             });
             $.each(Players[200], function(i, obj) {
                 var block = $('<div>', {class: 'playerBlock'});
                 Controls.paneRight.append(block);
-                constructPlayerBlock(block, obj, data);
+                constructPlayerBlock(block, obj, Participants[obj.participantId], data);
             });
         }
     };
     
-    var pbContent = '<img class="championLarge"/><div class="gbRight"><div class="gbUpper">{upper}</div><div class="gbLower">{lower}</div></div>';
+    var pbContent = '<div class="gbLeft"><span class="summonerName"></span><img class="championLarge"/></div><div class="gbRight"><div class="gbUpper">{upper}</div><div class="gbLower">{lower}</div></div>';
     var pbUpper = '<div class="centerHelper"></div><div class="summonerSpells"></div><div class="gameItems"></div>';
     var pbLower = '<div class="gameStats">{gStats}</div><div class="gameStats">{gStats2}</div>';
     var pStats = '<div class="gameKda"><img class="statIcon statScore" src="static/img/score.png"/><p>{kda}</p></div>\
@@ -177,7 +180,7 @@ $(document).ready(function() {
     var pStats2 = '<div class="gameLevel"><img class="statIcon statLevel" src="static/img/champion.png"/><p>Level {level}<div class="pipeBreak">|</div>{xpm} XPM</p></div>\
         <div class="gameGold"><img class="statIcon statGold" src="static/img/gold.png"/><p>{gold}<div class="pipeBreak">|</div>{gpm} GPM</p></div>';
     
-    var constructPlayerBlock = function(block, player, game) {
+    var constructPlayerBlock = function(block, player, ident, game) {
         var kda = {k: player.stats.kills || 0, d: player.stats.deaths || 0, a: player.stats.assists || 0};
         kda.kdr = Math.round((kda.k + kda.a) / kda.d * 100) / 100;
         kda.ratio = isNaN(kda.kdr) || kda.kdr === Infinity ? 'Perfect' : kda.kdr + ' : 1';
@@ -190,12 +193,21 @@ $(document).ready(function() {
         var lowerCont = pbLower.supplant({gStats: gameStats, gStats2: gameStats2});
         
         block.html(pbContent.supplant({upper: pbUpper, lower: lowerCont}));
+        
         if ((query.t == player.teamId) && (query.c == player.championId))
             block.css('background-color', '#bbdefb');
+            
+        var noIdentity = false;
+        if (ident.player)
+            block.find('.summonerName').text(ident.player.summonerName);
+        else
+            noIdentity = true;
         
         requestFromApi(query.s, Endpoint.champion, player.championId, function(rj1) {
             var j1 = JSON.parse(rj1);
             block.find('.championLarge').attr('src', requestFromDd(DDPoint.championIcon, j1.key + '.png'));
+            if (noIdentity)
+                block.find('.summonerName').text(j1.name);
         });
         requestFromApi(query.s, Endpoint.spell, player.spell1Id, function(rj2) {
             var j2 = JSON.parse(rj2);

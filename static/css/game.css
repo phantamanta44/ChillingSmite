@@ -166,11 +166,27 @@ select {
     box-shadow: 0 1px 5px 1px #a4a4a4;
 }
 
+.gbLeft {
+    display: inline-block;
+    width: 32%;
+    height: 100%;
+    vertical-align: top;
+}
+
+.summonerName {
+    display: inline-block;
+    width: 100%;
+    height: 16%;
+    line-height: 0.9vw;
+    font-family: 'Slabo 27px', serif;
+    font-weight: bold;
+    font-size: 1.2vw;
+}
+
 .championLarge {
     display: inline-block;
-    vertical-align: top;
-    width: 32%;
-    max-width: 100px;
+    margin-top: 2%;
+    height: 80%;
     box-shadow: 0 1px 3px #222;
 }
 
