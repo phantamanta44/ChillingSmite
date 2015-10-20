@@ -192,9 +192,9 @@ select {
 
 .gbRight {
     display: inline-block;
-    width: 58%;
+    width: 64%;
     height: 100%;
-    margin-left: 8%;
+    margin-left: 2%;
 }
 
 .gbUpper, .gbLower {

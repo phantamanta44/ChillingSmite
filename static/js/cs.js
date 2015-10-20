@@ -186,7 +186,7 @@ $(document).ready(function() {
         <div class="gbLowerRight"><div class="gameStats">{gStats}</div><div class="gameStats">{gStats2}</div></div>';
     var gStats = '<div class="gameKda"><img class="statIcon statScore" src="static/img/score.png"/><p>{kda}</p></div>\
         <div class="gameCsStats"><img class="statIcon statMinion" src="static/img/minion.png"/><p>{creeps}<div class="pipeBreak">|</div>{cpm} CPM</p></div>';
-    var kdaFormat = '{k} / {d} / {a}<div class="pipeBreak">|</div>{ratio}'
+    var kdaFormat = '{k} / {d} / {a}<div class="pipeBreak">|</div>{ratio}';
     var gStats2 = '<div class="gameLevel"><img class="statIcon statLevel" src="static/img/champion.png"/><p>Level {level}<div class="pipeBreak">|</div>{xpm} XPM</p></div>\
         <div class="gameGold"><img class="statIcon statGold" src="static/img/gold.png"/><p>{gold}<div class="pipeBreak">|</div>{gpm} GPM</p></div>';
     var gameTypes = {
