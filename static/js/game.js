@@ -28,6 +28,7 @@ $(document).ready(function() {
         qName: $('#inputName'),
         qServ: $('#inputServ'),
         paneError: $('#errorPane'),
+        paneTop: $('#topPane'),
         paneLeft: $('#leftPane'),
         paneRight: $('#rightPane'),
         paneBot: $('#bottomPane'),
@@ -145,6 +146,7 @@ $(document).ready(function() {
     
     var updatePage = function(rawJson) {
         if (!rawJson) {
+            Controls.paneTop.remove();
             Controls.paneLeft.remove();
             Controls.paneRight.remove();
             Controls.paneBot.remove();
@@ -171,7 +173,7 @@ $(document).ready(function() {
         }
     };
     
-    var pbContent = '<div class="gbLeft"><span class="summonerName"></span><img class="championLarge"/></div><div class="gbRight"><div class="gbUpper">{upper}</div><div class="gbLower">{lower}</div></div>';
+    var pbContent = '<div class="gbLeft"><img class="championLarge"/><span class="summonerName"></span></div><div class="gbRight"><div class="gbUpper">{upper}</div><div class="gbLower">{lower}</div></div>';
     var pbUpper = '<div class="centerHelper"></div><div class="summonerSpells"></div><div class="gameItems"></div>';
     var pbLower = '<div class="gameStats">{gStats}</div><div class="gameStats">{gStats2}</div>';
     var pStats = '<div class="gameKda"><img class="statIcon statScore" src="static/img/score.png"/><p>{kda}</p></div>\
