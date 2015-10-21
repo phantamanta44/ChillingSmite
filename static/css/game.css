@@ -192,6 +192,7 @@ select {
     align-items: center;
     height: 80%;
     width: 100%;
+    min-height: 1px; /* stupid Firefox workaround*/
     margin: 0 auto;
     margin-bottom: 3%;
 }
@@ -200,6 +201,11 @@ select {
     max-height: 100%;
     max-width: 100%;
     box-shadow: 0 1px 3px #222;
+}
+
+.rankIcon {
+    margin: 0 3.58%;
+    font-size: 0.8vw;
 }
 
 .gbRight {

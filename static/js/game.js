@@ -201,25 +201,32 @@ $(document).ready(function() {
             block.css('background-color', '#bbdefb');
             
         var noIdentity = false;
-        if (ident.player)
+        if (ident.player) {
             block.find('.summonerName').text(ident.player.summonerName);
+            appendRank(player, block);
+        }
         else
             noIdentity = true;
         
         requestFromApi(query.s, Endpoint.champion, player.championId, function(rj1) {
             var j1 = JSON.parse(rj1);
             block.find('.championLarge').attr('src', requestFromDd(DDPoint.championIcon, j1.key + '.png'));
-            if (noIdentity)
+            if (noIdentity) {
                 block.find('.summonerName').text(j1.name);
+                appendRank(player, block);
+            }
         });
+        
         requestFromApi(query.s, Endpoint.spell, player.spell1Id, function(rj2) {
             var j2 = JSON.parse(rj2);
             block.find('.summonerSpells').prepend($('<img>', {src: requestFromDd(DDPoint.spellIcon, j2.key + '.png')}));
         });
+        
         requestFromApi(query.s, Endpoint.spell, player.spell2Id, function(rj3) {
             var j3 = JSON.parse(rj3);
             block.find('.summonerSpells').append($('<img>', {src: requestFromDd(DDPoint.spellIcon, j3.key + '.png')}));
         });
+        
         for (var itemInd = 0; itemInd < 7; itemInd++) {
             var itemId = player.stats['item' + itemInd];
             if (itemId !== 0) {
@@ -231,6 +238,22 @@ $(document).ready(function() {
                 block.find('.gameItems').append($('<img>', {src: 'static/img/noTrinket.png'}));
             else
                 block.find('.gameItems').append($('<img>', {src: 'static/img/noItem.png'}));
+        }
+    };
+    
+    var rankedColors = {BRONZE: '#855b1f', SILVER: '#aaa', GOLD: '#bf9d3e', PLATINUM: '#26a3d9', DIAMOND: '#02a4d3', MASTER: '#92ada9', CHALLENGER: '#f0d878'};
+        
+    var appendRank = function(player, block) {
+        switch (player.highestAchievedSeasonTier) {
+            case 'UNRANKED':
+                break;
+            case 'MASTER':
+            case 'CHALLENGER':
+                block.find('.summonerName').prepend($('<i>', {class: 'fa fa-dot-circle-o rankIcon', style: 'color: ' + rankedColors[player.highestAchievedSeasonTier] + ';'}));
+                break;
+            default:
+                block.find('.summonerName').prepend($('<i>', {class: 'fa fa-circle rankIcon', style: 'color: ' + rankedColors[player.highestAchievedSeasonTier] + ';'}));
+                break;
         }
     };
     

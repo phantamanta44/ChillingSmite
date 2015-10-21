@@ -163,6 +163,7 @@ $(document).ready(function() {
     var appendGameData = function(wGame) {
         return function(rawJson) {
             var game = JSON.parse(rawJson);
+            console.log(wGame);
             gameData.push(game);
             mergeSort(gameData, function(a, b) {
                 return b.gameCreation - a.gameCreation;
