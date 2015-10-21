@@ -173,7 +173,8 @@ $(document).ready(function() {
         }
     };
     
-    var pbContent = '<div class="gbLeft"><img class="championLarge"/><span class="summonerName"></span></div><div class="gbRight"><div class="gbUpper">{upper}</div><div class="gbLower">{lower}</div></div>';
+    var pbContent = '<div class="gbLeft"><div class="champContainer"><img class="championLarge"/></div><span class="summonerName"></span>\
+        </div><div class="gbRight"><div class="gbUpper">{upper}</div><div class="gbLower">{lower}</div></div>';
     var pbUpper = '<div class="centerHelper"></div><div class="summonerSpells"></div><div class="gameItems"></div>';
     var pbLower = '<div class="gameStats">{gStats}</div><div class="gameStats">{gStats2}</div>';
     var pStats = '<div class="gameKda"><img class="statIcon statScore" src="static/img/score.png"/><p>{kda}</p></div>\

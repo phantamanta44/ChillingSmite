@@ -167,6 +167,8 @@ select {
 }
 
 .gbLeft {
+    display: flex;
+    flex-direction: column;
     flex: 1;
     width: 32%;
     height: 100%;
@@ -174,7 +176,7 @@ select {
 }
 
 .summonerName {
-    display: block;
+    flex: 3;
     width: 100%;
     height: 16%;
     line-height: 0.9vw;
@@ -183,11 +185,20 @@ select {
     font-size: 1vw;
 }
 
-.championLarge {
-    display: block;
+.champContainer {
+    flex: 16;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80%;
+    width: 100%;
     margin: 0 auto;
     margin-bottom: 3%;
-    max-width: 48%;
+}
+
+.championLarge {
+    max-height: 100%;
+    max-width: 100%;
     box-shadow: 0 1px 3px #222;
 }
 
