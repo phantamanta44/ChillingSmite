@@ -154,6 +154,25 @@ select {
     font-weight: bold;
 }
 
+.flexContainer {
+    display: flex;
+}
+
+#topPane > .flexContainer {
+    width: 96%;
+    margin: 0 auto;
+}
+
+#topPane > .flexContainer > div {
+    flex: 1;
+    height: 48px;
+    line-height: 48px;
+    font-size: 1vw;
+    margin: 0 12px;
+    border-radius: 2px;
+    box-shadow: 0 1px 3px 1px #999;
+}
+
 .playerBlock {
     display: flex;
     position: relative;

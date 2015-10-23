@@ -67,18 +67,17 @@ $(document).ready(function() {
     };
     
     var requestXml = function(url, cb, useProxy) {
-        var req = new XMLHttpRequest(), reqData;
-        req.addEventListener('load', function() {
-            if (req.status === 200)
-                cb.call(this, req.responseText);
-            else
-                cb.call(false);
+        var ajaxReq = $.ajax({url: useProxy ? 'http://whateverorigin.org/get?callback=?&url=' + encodeURIComponent(url) : url, dataType: 'json'});
+        ajaxReq.fail(function(e) {
+            cb.call(this, false, e.status);
         });
-        req.addEventListener('error', function() {
-            cb.call(false, req.status);
-        });
-        req.open('GET', useProxy ? 'http://cors.io/?u=' + url : url);
-        req.send();
+        if (useProxy) {
+            ajaxReq.done(function(e) {
+                cb.call(this, JSON.parse(e.contents));
+            });
+        }
+        else
+            ajaxReq.done(cb);
     };
     
     var Endpoint = {
@@ -132,7 +131,7 @@ $(document).ready(function() {
             Controls.paneError.text('Summoner not found!');
         }
         else {
-            data = JSON.parse(rawJson)[query.n.toLowerCase().replace(/\s/g, '')];
+            data = rawJson[query.n.toLowerCase().replace(/\s/g, '')];
             if (data.status && data.status.status_code.startsWith(/[45]/)) {
                 Controls.paneLeft.remove();
                 Controls.paneRight.parent().remove();
@@ -153,7 +152,7 @@ $(document).ready(function() {
             // Error handling
         }
         else {
-            var stats = JSON.parse(rawJson).playerStatSummaries;
+            var stats = rawJson.playerStatSummaries;
         }
     };
     
@@ -161,9 +160,7 @@ $(document).ready(function() {
     var gameData = [];
     
     var appendGameData = function(wGame) {
-        return function(rawJson) {
-            var game = JSON.parse(rawJson);
-            console.log(wGame);
+        return function(game) {
             gameData.push(game);
             mergeSort(gameData, function(a, b) {
                 return b.gameCreation - a.gameCreation;
@@ -190,12 +187,17 @@ $(document).ready(function() {
     var kdaFormat = '{k} / {d} / {a}<div class="pipeBreak">|</div>{ratio}';
     var gStats2 = '<div class="gameLevel"><img class="statIcon statLevel" src="static/img/champion.png"/><p>Level {level}<div class="pipeBreak">|</div>{xpm} XPM</p></div>\
         <div class="gameGold"><img class="statIcon statGold" src="static/img/gold.png"/><p>{gold}<div class="pipeBreak">|</div>{gpm} GPM</p></div>';
-    var gameTypes = {
-        NONE: 'Custom Match', NORMAL: 'Blind Pick 5v5', NORMAL_3x3: 'Blind Pick 3v3', ODIN_UNRANKED: 'Blind Pick Dominion', ARAM_UNRANKED_5x5: 'Blind Pick ARAM',
-        BOT: 'Botmatch 5v5', BOT_3x3: 'Botmatch 3v3', RANKED_SOLO_5x5: 'Solo Queue 5v5', RANKED_TEAM_3x3: 'Team Match 3v3', RANKED_TEAM_5x5: 'Team Match 5v5',
-        ONEFORALL_5x5: 'One for All', FIRSTBLOOD_1x1: 'Showdown 1v1', FIRSTBLOOD_2x2: 'Showdown 2v2', SR_6x6: 'Hexakill 5v5', CAP_5x5: 'Team Builder',
-        URF: 'Ultra Rapid Fire', URF_BOT: 'URF Botmatch', NIGHTMARE_BOT: 'Nightmare Botmatch', ASCENSION: 'Ascension', HEXAKILL: 'Hexakill 3v3',
-        KING_PORO: 'King Poro', COUNTER_PICK: 'Nemesis', BILGEWATER: 'Black Market Brawlers'
+    var gameType = {
+        0: 'Custom Match', 8: 'Blind Pick 3v3', 2: 'Blind Pick 5v5', 14: 'Draft Pick 5v5',
+        4: 'Solo Queue 5v5', 6: 'Ranked Premade 5v5', 9: 'Ranked Premade 3v3',
+        41: 'Team Match 3v3', 42: 'Team Match 5v5', 16: 'Blind Pick Dominion',
+        17: 'Draft Pick Dominion', 7: 'Botmatch 5v5', 25: 'Botmatch Dominion', 31: 'Botmatch 5v5',
+        32: 'Botmatch 5v5', 33: 'Botmatch 5v5', 52: 'Botmatch 3v3',
+        61: 'Team Builder 5v5', 65: 'Blind Pick ARAM', 70: 'One for All', 72: 'Showdown 1v1',
+        73: 'Showdown 2v2', 75: 'SR Hexakill', 76: 'Ultra Rapid Fire', 83: 'URF Botmatch',
+        91: 'Doom Bots', 92: 'Doom Bots', 93: 'Doom Bots',
+        96: 'Ascension', 98: 'TT Hexakill', 100: 'Butcher\'s Bridge ARAM',
+        300: 'King Poro', 310: 'Nemesis', 313: 'Black Market Brawlers'
     };
     var gameUrl = 'game.html?g={gid}&s={serv}&t={team}&c={cid}';
     
@@ -239,22 +241,19 @@ $(document).ready(function() {
         var gold = wGame.stats.goldEarned;
         var gpm = Math.round((gold / game.gameDuration) * 6000) / 100;
         var gameStats2 = gStats2.supplant({level: wGame.stats.level, xpm: avg(thePlayer.timeline.xpPerMinDeltas), gold: gold, gpm: gpm});
-        var lowerCont = gbLower.supplant({gameTime: gameTime, gameDate: gameDate, gameMode: gameTypes[wGame.subType], gStats: gameStats, gStats2: gameStats2});
+        var lowerCont = gbLower.supplant({gameTime: gameTime, gameDate: gameDate, gameMode: gameType[game.queueId], gStats: gameStats, gStats2: gameStats2});
         
         block.html(gbContent.supplant({upper: upperCont, lower: lowerCont}));
         
         block.find('.gameOutcome').css('background-color', won ? '#81c784' : '#e57373');
         
-        requestFromApi(query.s, Endpoint.champion, thePlayer.championId, function(rj1) {
-            var j1 = JSON.parse(rj1);
+        requestFromApi(query.s, Endpoint.champion, thePlayer.championId, function(j1) {
             block.find('.championLarge').attr('src', requestFromDd(DDPoint.championIcon, j1.key + '.png'));
         });
-        requestFromApi(query.s, Endpoint.spell, thePlayer.spell1Id, function(rj2) {
-            var j2 = JSON.parse(rj2);
+        requestFromApi(query.s, Endpoint.spell, thePlayer.spell1Id, function(j2) {
             block.find('.summonerSpells').prepend($('<img>', {src: requestFromDd(DDPoint.spellIcon, j2.key + '.png')}));
         });
-        requestFromApi(query.s, Endpoint.spell, thePlayer.spell2Id, function(rj3) {
-            var j3 = JSON.parse(rj3);
+        requestFromApi(query.s, Endpoint.spell, thePlayer.spell2Id, function(j3) {
             block.find('.summonerSpells').append($('<img>', {src: requestFromDd(DDPoint.spellIcon, j3.key + '.png')}));
         });
         for (var itemInd = 0; itemInd < 7; itemInd++) {
@@ -290,8 +289,7 @@ $(document).ready(function() {
     var itemDescHtml = '<div class="itemName">{name}</div><div class="itemDesc">{desc}</div>';
     
     var constructItemTooltip = function(block) {
-        return function(rawJson) {
-            var item = JSON.parse(rawJson);
+        return function(item) {
             var iDesc = item.description.replace(/BBFFFF/g, '00bcd4');
             block.mouseover(function() {
                 Controls.tooltip.css('display', 'block');
@@ -317,7 +315,7 @@ $(document).ready(function() {
             // Error handling
         }
         else {
-            var games = JSON.parse(rawJson).games;
+            var games = rawJson.games;
             for (var i = 0; i < games.length; i++)
                 requestFromAcs(query.s, games[i].gameId, appendGameData(games[i]));
         }
