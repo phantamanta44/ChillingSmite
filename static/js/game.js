@@ -33,6 +33,8 @@ $(document).ready(function() {
         paneRight: $('#rightPane'),
         paneBot: $('#bottomPane'),
         statsTable: $('#gsTable'),
+        timelineTabs: $('#tsTabs'),
+        timelineTable: [$('#tsTable1t'), $('#tsTable2t'), $('#tsTable3t'), $('#tsTable4t')],
         tooltip: $('#tooltip')
     };
     
@@ -160,6 +162,15 @@ $(document).ready(function() {
             });
             
             populateStats();
+            populateTimeline();
+            
+            $.each(queuedNames, function(i, id) {
+                requestFromApi(query.s, Endpoint.champion, id, function(j1) {
+                    var imgHtml = '<img src="' + requestFromDd(DDPoint.championIcon, j1.key + '.png') + '"/>';
+                    $('#gsHeader' + i).html(imgHtml);
+                    $('.tsHeader' + i).html(imgHtml);
+                });
+            });
             
             Controls.paneBot.children('div').find('.expBtn').click(function(e) {
                 var targetI = $(e.target);
@@ -380,9 +391,62 @@ $(document).ready(function() {
             });
             Controls.statsTable.append(tr);
         });
-        $.each(queuedNames, function(i, id) {
-            requestFromApi(query.s, Endpoint.champion, id, function(j1) {
-                $('#gsHeader' + i).html('<img src="' + requestFromDd(DDPoint.championIcon, j1.key + '.png') + '"/>');
+    };
+    
+    var tTableTemplate = [
+        ['Summoner'], ['Lane'], ['Role'],
+        ['<hr>'],
+        ['CS Per Minute'], ['Gold Per Minute'], ['XP Per Minute'], ['Damage Taken Per Minute']
+    ];
+    var tTable = {
+        zeroToTen: $.extend(true, {}, tTableTemplate),
+        tenToTwenty: $.extend(true, {}, tTableTemplate),
+        twentyToThirty: $.extend(true, {}, tTableTemplate),
+        thirtyToEnd: $.extend(true, {}, tTableTemplate)
+    };
+    
+    var populateTimeline = function() {
+        $.each(Players, function(arrayKey, array) {
+            $.each(array, function(pInd, player) {
+                $.each(tTable, function(k, t) {
+                    t[0].push('<div class="tsHeader{i}">Summoner {i}</div>'.supplant({i: pInd + (arrayKey == 200 ? 5 : 0)}));
+                    t[1].push(lanes[player.timeline.lane]);
+                    t[2].push(roles[player.timeline.role]);
+                    t[4].push(Math.round(player.timeline.creepsPerMinDeltas[k] * 100) / 100);
+                    t[5].push(Math.round(player.timeline.goldPerMinDeltas[k] * 100) / 100);
+                    t[6].push(Math.round(player.timeline.xpPerMinDeltas[k] * 100) / 100);
+                    t[7].push(Math.round(player.timeline.damageTakenPerMinDeltas[k] * 100) / 100);
+                });
+            });
+        });
+        var aTab = $.map(tTable, function(elem) {
+            return elem;
+        });
+        $.each(aTab, function(tableInd, table) {
+            $.each(table, function(i, obj) {
+                var tr = $('<tr>');
+                $.each(obj, function(j, cont) {
+                    var td = $('<td>');
+                    td.html(cont);
+                    tr.append(td);
+                });
+                Controls.timelineTable[tableInd].append(tr);
+            });
+        });
+        $(Controls.timelineTabs).children().each(function (i) {
+            $(this).click(function(e) {
+                var target = $(e.target);
+                target.parent().children().removeClass('tsSelected');
+                target.addClass('tsSelected');
+                target.parent().parent().children('table').fadeOut({
+                    duration: 500,
+                    queue: false
+                }).promise().done(function () {
+                    $('#' + target.attr('id') + 't').fadeIn({
+                        duration: 500,
+                        queue: false
+                    });
+                });
             });
         });
     };

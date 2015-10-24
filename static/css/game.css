@@ -327,7 +327,7 @@ select {
     padding: 16px 0;
     margin: 20px auto;
     overflow: hidden;
-    transition: max-height 1.5s;
+    transition: max-height 0.85s;
     box-shadow: 0 1px 5px 1px #a4a4a4;
 }
 
@@ -349,27 +349,80 @@ select {
     margin-top: 0;
 }
 
-#gsTable {
+#gsTable, .tsTable {
     width: 97%;
     margin: 0 auto;
     font-size: 1vw;
     table-layout: fixed;
 }
 
-#gsTable td {
+#gsTable td, .tsTable td {
     border: 0;
     border-bottom: 1px solid #c2c2c2;
 }
 
-#gsTable td:first-child {
+#gsTable td:first-child, .tsTable td:first-child {
     font-weight: bold;
     text-align: left;
     width: 16%;
     border: 0;
 }
 
-#gsTable img {
+#gsTable img, .tsTable img {
     max-height: 3vw;
+}
+
+#tsTabs {
+    display: flex;
+    width: 97%;
+    height: 128px;
+    line-height: 54px;
+    margin: 0 auto;
+    margin-bottom: 20px;
+    padding: 0;
+    box-shadow: 0 1px 5px 0 #888;
+}
+
+#tsTabs > div {
+    height: 100%;
+    font-size: 1vw;
+    color: rgba(2, 2, 2, 0);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    transition: background-color 0.4s, color 0.4s;
+    cursor: pointer;
+}
+
+#tsTabs > div:hover {
+    background-color: rgba(0, 110, 130, 0.25);
+    color: #222;
+}
+
+#tsTable1, #tsTable2, #tsTable3 {
+    flex: 1;
+}
+
+#tsTable1 {
+    background-image: url(../img/tl1.png);
+}
+
+#tsTable2, #tsTable3 {
+    background-image: url(../img/tl2.png);
+}
+
+#tsTable4 {
+    flex: 3;
+    line-height: 60px;
+    background-image: url(../img/tl3.png);
+}
+
+.tsSelected {
+    background-color: rgba(0, 130, 150, 0.15);
+}
+
+.tsTable {
+    display: none;
 }
 
 #tooltip {
