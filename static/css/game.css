@@ -19,6 +19,14 @@ h2 {
     margin-bottom: 18px;
 }
 
+hr {
+    border: 0;
+    height: 0;
+    margin: 0 2%;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
 .centerHelper {
     display: inline-block;
     vertical-align: middle;
@@ -311,6 +319,57 @@ select {
     max-width: 20px;
     margin-right: 4.2%;
     vertical-align: middle;
+}
+
+#bottomPane > div {
+    width: 97%;
+    max-height: 3000px;
+    padding: 16px 0;
+    margin: 20px auto;
+    overflow: hidden;
+    transition: max-height 1.5s;
+    box-shadow: 0 1px 5px 1px #a4a4a4;
+}
+
+#bottomPane .blockContents {
+    display: none;
+}
+
+#bottomPane > .hiddenSb {
+    max-height: 29px;
+}
+
+.expBtn {
+    float: right;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+#statBlock1 {
+    margin-top: 0;
+}
+
+#gsTable {
+    width: 97%;
+    margin: 0 auto;
+    font-size: 1vw;
+    table-layout: fixed;
+}
+
+#gsTable td {
+    border: 0;
+    border-bottom: 1px solid #c2c2c2;
+}
+
+#gsTable td:first-child {
+    font-weight: bold;
+    text-align: left;
+    width: 16%;
+    border: 0;
+}
+
+#gsTable img {
+    max-height: 3vw;
 }
 
 #tooltip {

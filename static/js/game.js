@@ -32,6 +32,7 @@ $(document).ready(function() {
         paneLeft: $('#leftPane'),
         paneRight: $('#rightPane'),
         paneBot: $('#bottomPane'),
+        statsTable: $('#gsTable'),
         tooltip: $('#tooltip')
     };
     
@@ -156,6 +157,17 @@ $(document).ready(function() {
                 var block = $('<div>', {class: 'playerBlock'});
                 Controls.paneRight.append(block);
                 constructPlayerBlock(block, obj, Participants[obj.participantId], data);
+            });
+            
+            populateStats();
+            
+            Controls.paneBot.children('div').find('.expBtn').click(function(e) {
+                var targetI = $(e.target);
+                var targetDiv = targetI.parent().parent();
+                targetDiv.children('.blockContents').slideToggle({duration: 800, queue: false});
+                targetDiv.toggleClass('hiddenSb');
+                targetI.toggleClass('fa-plus');
+                targetI.toggleClass('fa-minus');
             });
         }
     };
@@ -294,6 +306,85 @@ $(document).ready(function() {
                 block.find('.summonerName').prepend($('<i>', {class: 'fa fa-circle rankIcon', style: 'color: ' + rankedColors[player.highestAchievedSeasonTier] + ';'}));
                 break;
         }
+    };
+    
+    var sTable = [
+        ['Summoner'],
+        ['Champion Lane'], ['Champion Role'],
+        ['<hr>'],
+        ['Killing Sprees'], ['Largest Killing Spree'], ['Largest Multikill'], ['Towers Destroyed'], ['Inhibitors Destroyed'], ['First Blood?'],
+        ['<hr>'],
+        ['Physical Damage Dealt'], ['Magic Damage Dealt'], ['True Damage Dealt'], ['Total Damage Dealt'],
+        ['Physical Damage to Champions'], ['Magic Damage to Champions'], ['True Damage to Champions'], ['Total Damage to Champions'],
+        ['Crowd Control Dealt'], ['Largest Critical Strike'],
+        ['<hr>'],
+        ['Physical Damage Taken'], ['Magic Damage Taken'], ['True Damage Taken'], ['Total Damage Taken'],
+        ['Health Healed'],
+        ['<hr>'],
+        ['Wards Placed'], ['Wards Destroyed'], ['Vision Wards Purchased'], ['Stealth Wards Purchased'],
+        ['<hr>'],
+        ['Gold Earned'], ['Gold Spent'], ['Minions Killed'], ['Neutral Monsters Killed'], ['Total Monsters Killed'],
+        ['Allied Jungle Score'], ['Enemy Jungle Score']
+    ];
+    var queuedNames = [];
+    var roles = {NONE: 'None', DUO: 'Duo Lane', SOLO: 'Solo Lane', DUO_CARRY: 'ADC', DUO_SUPPORT: 'Support'};
+    var lanes = {TOP: 'Top', MID: 'Middle', MIDDLE: 'Middle', BOT: 'Bottom', BOTTOM: 'Bottom', JUNGLE: 'Jungle'};
+    
+    var populateStats = function() {
+        $.each(Players, function(arrayKey, array) {
+            $.each(array, function(i, player) {
+                sTable[0].push('<div id="gsHeader{i}">Summoner {i}</div>'.supplant({i: i + (arrayKey == 200 ? 5 : 0)}));
+                queuedNames.push(player.championId);
+                sTable[1].push(lanes[player.timeline.lane]);
+                sTable[2].push(roles[player.timeline.role]);
+                sTable[4].push(player.stats.killingSprees);
+                sTable[5].push(player.stats.largestKillingSpree);
+                sTable[6].push(player.stats.largestMultiKill);
+                sTable[7].push(player.stats.towerKills);
+                sTable[8].push(player.stats.inhibitorKills);
+                sTable[9].push(player.stats.firstBloodKill ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>');
+                sTable[11].push(player.stats.physicalDamageDealt);
+                sTable[12].push(player.stats.magicDamageDealt);
+                sTable[13].push(player.stats.trueDamageDealt);
+                sTable[14].push(player.stats.totalDamageDealt);
+                sTable[15].push(player.stats.physicalDamageDealtToChampions);
+                sTable[16].push(player.stats.magicDamageDealtToChampions);
+                sTable[17].push(player.stats.trueDamageDealtToChampions);
+                sTable[18].push(player.stats.totalDamageDealtToChampions);
+                sTable[19].push(player.stats.totalTimeCrowdControlDealt + ' Sec');
+                sTable[20].push(player.stats.largestCriticalStrike);
+                sTable[22].push(player.stats.physicalDamageTaken);
+                sTable[23].push(player.stats.magicDamageTaken);
+                sTable[24].push(player.stats.trueDamageTaken);
+                sTable[25].push(player.stats.totalDamageTaken);
+                sTable[26].push(player.stats.totalHeal);
+                sTable[28].push(player.stats.wardsPlaced);
+                sTable[29].push(player.stats.wardsKilled);
+                sTable[30].push(player.stats.visionWardsBoughtInGame);
+                sTable[31].push(player.stats.sightWardsBoughtInGame);
+                sTable[33].push(player.stats.goldEarned);
+                sTable[34].push(player.stats.goldSpent);
+                sTable[35].push(player.stats.minionsKilled);
+                sTable[36].push(player.stats.neutralMinionsKilled);
+                sTable[37].push(player.stats.minionsKilled + player.stats.neutralMinionsKilled);
+                sTable[38].push(player.stats.neutralMinionsKilledTeamJungle);
+                sTable[39].push(player.stats.neutralMinionsKilledEnemyJungle);
+            });
+        });
+        $.each(sTable, function(i, obj) {
+            var tr = $('<tr>');
+            $.each(obj, function(j, cont) {
+                var td = $('<td>');
+                td.html(cont);
+                tr.append(td);
+            });
+            Controls.statsTable.append(tr);
+        });
+        $.each(queuedNames, function(i, id) {
+            requestFromApi(query.s, Endpoint.champion, id, function(j1) {
+                $('#gsHeader' + i).html('<img src="' + requestFromDd(DDPoint.championIcon, j1.key + '.png') + '"/>');
+            });
+        });
     };
     
     var itemDescHtml = '<div class="itemName">{name}</div><div class="itemDesc">{desc}</div>';
