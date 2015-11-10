@@ -8,8 +8,8 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
         <link rel="stylesheet" type="text/css" href="static/css/main.css">
         <script src="static/js/jquery-2.1.4.min.js"></script>
-        <script src="static/js/merge-sort.js"></script>
         <script src="static/js/b64.js"></script>
+        <script src="static/js/chart.js"></script>
         <script src="static/js/cs.js"></script>
         <title>Chilling Smite</title>
     </head>
@@ -45,12 +45,30 @@
                     </div>
                 </div>
                 <div id="leftPaneBot" class="umPane">
-                    <strong>Work-in-progress stats panel</strong><br>
-                    Lorem ipsum dolor set amet consectetur adipiscing elit sed do...
+                    <div class="paneContainer" id="leftPaneContainer">
+                        <h2>Stats</h2>
+                        <div id="statLoading">
+                            <i class="fa fa-circle-o-notch fa-spin"></i>
+                        </div>
+                        <div id="statLoaded">
+                            <div class="statBlock">
+                                <h3>Creep Score Per Minute</h3>
+                                <canvas class="statChart" id="csChart"></canvas>
+                            </div>
+                            <div class="statBlock">
+                                <h3>Warding</h3>
+                                <canvas class="statChart" id="wardChart"></canvas>
+                            </div>
+                            <div class="statBlock">
+                                <h3>Dolor Set Amet</h3>
+                                <canvas class="statChart" id="anotherChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="rightPane" class="dualPanes">
-                <div id="rightPaneContainer">
+                <div class="paneContainer" id="rightPaneContainer">
                     <h2>Recent Games</h2>
                 </div>
             </div>

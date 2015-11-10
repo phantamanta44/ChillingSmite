@@ -147,34 +147,54 @@ $(document).ready(function() {
         }
     };
     
+    var stats;
+    
     var updateStats = function(rawJson) {
         if (!rawJson) {
             // Error handling
         }
-        else {
-            var stats = rawJson.playerStatSummaries;
-        }
+        else
+            stats = rawJson.playerStatSummaries;
     };
     
-    var gameBlock = '<div class="gameBlock" id="gameBlock{gid}"></div>';
-    var gameData = [];
+    var lineStyling = {
+        fillColor: 'rgba(114, 202, 249, 0.3)',
+        strokeColor: '#64b5f6',
+        pointColor: '#2196f3',
+        pointStrokeColor: '#1976d2',
+        pointHighlightFill: '#42a5f5',
+        pointHighlightStroke: '2196f3',
+    };
+    var lineStyling2 = {
+        fillColor: 'rgba(129, 199, 132, 0.3)',
+        strokeColor: '#81c7f4',
+        pointColor: '#4caf50',
+        pointStrokeColor: '#388e3c',
+        pointHighlightFill: '#66bb6a',
+        pointHighlightStroke: '4caf50',
+    };
+    var gpMapping = {};
     
-    var appendGameData = function(wGame) {
-        return function(game) {
-            gameData.push(game);
-            mergeSort(gameData, function(a, b) {
-                return b.gameCreation - a.gameCreation;
-            });
-            var ind = gameData.indexOf(game) + 1;
-            if (ind >= gameData.length) {
-                Controls.paneRight.append(gameBlock.supplant({gid: game.gameId}));
-                constructGameBlock(game, wGame);
-            }
-            else {
-                $('#gameBlock' + gameData[ind].gameId).before(gameBlock.supplant({gid: game.gameId}));
-                constructGameBlock(game, wGame);
-            }
-        };
+    var aggregateStats = function() {
+        console.log(gameData);
+        console.log(games);
+        $('#statLoading').hide();
+        $('#statLoaded').show();
+        var csData = {labels: [], datasets: [$.extend({}, {data: []}, lineStyling)]};
+        for (var i = games.length - 1; i >= 0; i--) {
+            csData.labels.push(i + 1);
+            var creepKills = (games[i].stats.minionsKilled || 0) + (games[i].stats.neutralMinionsKilled || 0);
+            var gameTime = gameData[i].gameDuration / 60;
+            csData.datasets[0].data.push(Math.round(100 * creepKills / gameTime) / 100);
+        }
+        new Chart(document.getElementById('csChart').getContext('2d')).Line(csData);
+        var wardData = {labels: [], datasets: [$.extend({}, {label: 'Placed', data: []}, lineStyling), $.extend({}, {label: 'Killed', data: []}, lineStyling2)]};
+        for (var j = games.length - 1; j >= 0; j--) {
+            wardData.labels.push(j + 1);
+            wardData.datasets[0].data.push(games[j].stats.wardPlaced || 0);
+            wardData.datasets[1].data.push(gpMapping[gameData[j].gameId].stats.wardsKilled || 0);
+        }
+        new Chart(document.getElementById('wardChart').getContext('2d')).Line(wardData);
     };
     
     var gbContent = '<div class="gbUpper">{upper}</div><div class="gbLower">{lower}</div><div class="detailsBtn"><i class="fa fa-ellipsis-h"></i></div>';
@@ -225,6 +245,8 @@ $(document).ready(function() {
             thePlayer = players[data.id] = rPlayersCopy[count[100]];
         else
             thePlayer = players[data.id] = rPlayersCopy[0];
+            
+        gpMapping[game.gameId] = thePlayer;
         
         var won = wGame.stats.win;
         var upperCont = gbUpper.supplant({outcome: won ? 'VICTORY' : 'DEFEAT'});
@@ -310,14 +332,38 @@ $(document).ready(function() {
         };
     };
     
+    var gameBlock = '<div class="gameBlock" id="gameBlock{gid}"></div>';
+    var gameData = [];
+    
+    var appendGameData = function(wGame) {
+        return function(game) {
+            gameData.push(game);
+            var ind = gameData.indexOf(game) + 1;
+            if (ind >= gameData.length) {
+                Controls.paneRight.append(gameBlock.supplant({gid: game.gameId}));
+                constructGameBlock(game, wGame);
+            }
+            else {
+                $('#gameBlock' + gameData[ind].gameId).before(gameBlock.supplant({gid: game.gameId}));
+                constructGameBlock(game, wGame);
+            }
+            if (++gameDataIndex < games.length)
+                requestFromAcs(query.s, games[gameDataIndex].gameId, appendGameData(games[gameDataIndex], gameDataIndex));
+            else
+                aggregateStats();
+        };
+    };
+    
+    var games;
+    var gameDataIndex = 0;
+    
     var updateGames = function(rawJson) {
         if (!rawJson) {
             // Error handling
         }
         else {
-            var games = rawJson.games;
-            for (var i = 0; i < games.length; i++)
-                requestFromAcs(query.s, games[i].gameId, appendGameData(games[i]));
+            games = rawJson.games;
+            requestFromAcs(query.s, games[gameDataIndex].gameId, appendGameData(games[gameDataIndex], gameDataIndex));
         }
     };
     
@@ -332,6 +378,10 @@ $(document).ready(function() {
         if (e.keyCode === 13)
             Controls.qSubmit.click();
     });
+    
+    Chart.defaults.global.responsive = true;
+    Chart.defaults.global.tooltipTemplate = '<%= value %>';
+    Chart.defaults.Line.bezierCurveTension = 0.314;
     
     var headerText = '<a href="http://{loc}" class="hiddenLink"><h2 id="headerLink">Chilling Smite</h2></a>';
     
