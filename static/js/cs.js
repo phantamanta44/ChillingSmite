@@ -103,7 +103,7 @@ $(document).ready(function() {
     };
     var baseDataDragon = 'https://ddragon.leagueoflegends.com/cdn/{vers}/{ept}/{params}';
     var baseDataDragonStatic = 'http://ddragon.leagueoflegends.com/cdn/{ept}/{params}';
-    var ddVers = '5.23.1';
+    var ddVers = '6.2.1';
     
     var requestFromDd = function(ept, params) {
         var request = ept.staticReq ? baseDataDragonStatic : baseDataDragon;

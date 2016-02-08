@@ -107,12 +107,21 @@ $(document).ready(function() {
     };
     var baseDataDragon = 'https://ddragon.leagueoflegends.com/cdn/{vers}/{ept}/{params}';
     var baseDataDragonStatic = 'http://ddragon.leagueoflegends.com/cdn/{ept}/{params}';
-    var ddVers = '5.23.1';
+    var ddVers = '6.2.1';
     
     var requestFromDd = function(ept, params) {
         var request = ept.staticReq ? baseDataDragonStatic : baseDataDragon;
         request = request.supplant({ept: ept.ept, params: encodeURIComponent(params), vers: ddVers});
         return request;
+    };
+    
+    var baseAcsRequest = 'https://acs.leagueoflegends.com/{vers}/stats/game/{serv}/{gid}';
+    var acsVers = 'v1';
+    var acsServers = {na: 'NA1', euw: 'EUW1', br: 'BR1', eune: 'EUN1', lan: 'LA1', las: 'LA2', tr: 'TR1', oce: 'OC1', ru: 'RU', kr: 'KR'};
+    
+    var requestFromAcs = function(serv, game, cb) {
+        var request = baseAcsRequest.supplant({vers: acsVers, serv: acsServers[serv], gid: game});
+        requestXml(request, cb, true);
     };
 
     var data;
@@ -145,8 +154,8 @@ $(document).ready(function() {
             Controls.paneError.remove();
             parseData(data);
             
-            $('#blueHeader').text(Team[100].winner ? 'VICTORY' : 'DEFEAT');
-            $('#redHeader').text(Team[200].winner ? 'VICTORY' : 'DEFEAT');
+            $('#blueHeader').text(Team[100].win == 'Win' ? 'VICTORY' : 'DEFEAT');
+            $('#redHeader').text(Team[200].win == 'Win' ? 'VICTORY' : 'DEFEAT');
             
             populateMatchOverview();
             
@@ -208,9 +217,16 @@ $(document).ready(function() {
         ASCENSION_5x5: 'Ascension', HEXAKILL: 'Twisted Treeline Hexakill', BILGEWATER_ARAM_5x5: 'Butcher\'s Bridge ARAM',
         KING_PORO_5x5: 'King Poro', COUNTER_PICK: 'Nemesis', BILGEWATER_5x5: 'Black Market Brawlers'
     };
+    var queueType = {
+        0: 'CUSTOM', 8: 'NORMAL_3x3', 2: 'NORMAL_5x5_BLIND', 14: 'NORMAL_5x5_DRAFT', 4: 'RANKED_SOLO_5x5', 6: 'RANKED_PREMADE_5x5', 9: 'RANKED_PREMADE_3x3',
+        41: 'RANKED_TEAM_3x3', 42: 'RANKED_TEAM_5x5', 16: 'ODIN_5x5_BLIND', 17: 'ODIN_5x5_DRAFT', 7: 'BOT_5x5', 25: 'BOT_ODIN_5x5', 31: 'BOT_5x5_INTRO',
+        32: 'BOT_5x5_BEGINNER', 33: 'BOT_5x5_INTERMEDIATE', 52: 'BOT_TT_3x3', 61: 'GROUP_FINDER_5x5', 65: 'ARAM_5x5', 70: 'ONEFORALL_5x5', 72: 'FIRSTBLOOD_1x1',
+        73: 'FIRSTBLOOD_2x2', 75: 'SR_6x6', 76: 'URF_5x5', 83: 'BOT_URF_5x5', 91: 'NIGHTMARE_BOT_5x5_RANK1', 92: 'NIGHTMARE_BOT_5x5_RANK2', 93: 'NIGHTMARE_BOT_5x5_RANK5',
+        96: 'ASCENSION_5x5', 98: 'HEXAKILL', 100: 'BILGEWATER_ARAM_5x5', 300: 'KING_PORO_5x5', 310: 'COUNTER_PICK', 313: 'BILGEWATER_5x5'
+    };
     
     var populateMatchOverview = function() {
-        var createTime = new Date(data.matchCreation);
+        var createTime = new Date(data.gameCreation);
         var dateObj = {
             m: months[createTime.getMonth()], d: createTime.getDate(), y: createTime.getFullYear(),
             hr: createTime.getHours(), min: createTime.getMinutes()
@@ -219,11 +235,11 @@ $(document).ready(function() {
         if (dateObj.min < 10) dateObj.min = '0' + dateObj.min;
         $('#ovTimestamp').html(OverviewContent.timestamp.supplant(dateObj));
         
-        var modSec = data.matchDuration % 60;
-        var gameTime = {m: (data.matchDuration - modSec) / 60, s: modSec < 10 ? '0' + modSec : modSec};
+        var modSec = data.gameDuration % 60;
+        var gameTime = {m: (data.gameDuration - modSec) / 60, s: modSec < 10 ? '0' + modSec : modSec};
         $('#ovLength').html(OverviewContent.mLength.supplant(gameTime));
         
-        $('#ovGamemode').html(OverviewContent.gamemode.supplant({gm: gameType[data.queueType]}));
+        $('#ovGamemode').html(OverviewContent.gamemode.supplant({gm: gameType[queueType[data.queueId]]}));
         $('#ovServ').html(OverviewContent.serv.supplant({serv: servName[data.platformId]}));
         
         var playerCounts = {100: {k: 0, d: 0, a: 0}, 200: {k: 0, d: 0, a: 0}};
@@ -252,7 +268,7 @@ $(document).ready(function() {
         var kda = {k: player.stats.kills || 0, d: player.stats.deaths || 0, a: player.stats.assists || 0};
         kda.kdr = Math.round((kda.k + kda.a) / kda.d * 100) / 100;
         kda.ratio = isNaN(kda.kdr) || kda.kdr === Infinity ? 'Perfect' : kda.kdr + ' : 1';
-        var creeps = (player.stats.minionsKilled || 0) + (player.stats.neutralMinionsKilled || 0);
+        var creeps = (player.stats.totalMinionsKilled || 0) + (player.stats.neutralMinionsKilled || 0);
         var cpm = Math.round((creeps / game.matchDuration) * 6000) / 100;
         var gameStats = pStats.supplant({kda: kdaFormat.supplant(kda), creeps: creeps, cpm: cpm});
         var gold = player.stats.goldEarned;
@@ -495,7 +511,7 @@ $(document).ready(function() {
         $('#qForm').prepend(headerText.supplant({loc: document.location.host + document.location.pathname}));
         Controls.qName.val(query.n);
         Controls.qServ.val(query.s);
-        requestFromApi(query.s, Endpoint.match, query.g, updatePage);
+        requestFromAcs(query.s, query.g, updatePage);
     }
     
 });
