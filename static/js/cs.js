@@ -50,17 +50,11 @@ var getCachedData = function() {
 };
 
 var requestXml = function(url, cb, useProxy) {
-    var ajaxReq = $.ajax({url: useProxy ? 'http://whateverorigin.org/get?callback=?&url=' + encodeURIComponent(url) : url, dataType: 'json'});
+    var ajaxReq = $.ajax({url: useProxy ? 'http://cors.io/?u=' + encodeURIComponent(url) : url, dataType: 'json'});
     ajaxReq.fail(function(e) {
         cb.call(this, false, e.status);
     });
-    if (useProxy) {
-        ajaxReq.done(function(e) {
-            cb.call(this, JSON.parse(e.contents));
-        });
-    }
-    else
-        ajaxReq.done(cb);
+    ajaxReq.done(cb);
 };
 
 var Endpoint = {
