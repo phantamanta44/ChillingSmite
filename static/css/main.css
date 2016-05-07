@@ -16,20 +16,19 @@ body {
 }
 
 #loadingScreen {
+    margin-top: 48px;
     width: 100%;
-    height: 174px;
+    height: 64px;
 }
 
 #loadingSpinner {
-    width: 114px;
-    height: 114px;
+    width: 40px;
+    height: 40px;
     display: block;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 80px;
-    color: #2196F3;
 }
 
 #firstpage {

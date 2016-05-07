@@ -87,6 +87,7 @@ $(document).ready(function() {
                 });
                 
                 clearLoading();
+                linkEffects();
             });
         }
     };
@@ -181,7 +182,14 @@ $(document).ready(function() {
             
         var noIdentity = false;
         if (ident.player) {
-            block.find('.summonerName').text(ident.player.summonerName);
+            var snBlock = block.find('.summonerName');
+            snBlock.text(ident.player.summonerName);
+            snBlock.addClass('snLinked');
+            snBlock.click(function() {
+                unclearLoading(function() {
+                    window.location = queryTemplate.supplant({name: ident.player.summonerName, serv: query.s});
+                });
+            });
             appendRank(player, block);
         }
         else
@@ -394,7 +402,7 @@ $(document).ready(function() {
     
     Controls.qSubmit.click(function(e) {
         if (Controls.qName.val())
-            window.location = queryTemplate.supplant({name: Controls.qName.val(), serv: Controls.qServ.val()});
+            unclearLoading(function() { window.location = queryTemplate.supplant({name: Controls.qName.val(), serv: Controls.qServ.val()}) });
     }); 
     
     Controls.qName.keydown(function(e) {
@@ -404,11 +412,24 @@ $(document).ready(function() {
     
     var headerText = '<a href="http://{loc}" class="hiddenLink"><h2 id="headerLink">Chilling Smite</h2></a>';
     
-    var loadingScreen = $('#loadingScreen');
+    var loadingScreen = $('#loadingScreen'), pageWrapper = $('#pageWrapper');
     var clearLoading = function() {
         loadingScreen.slideUp(740).animate({opacity: 0}, {queue: false, duration: 740, complete: function() {
-            $('#pageWrapper').slideDown(740).animate({opacity: 1}, {queue: false, duration: 740});
+            pageWrapper.slideDown(740).animate({opacity: 1}, {queue: false, duration: 740});
         }});
+    };
+    var unclearLoading = function(cb) {
+        pageWrapper.slideUp(740).animate({opacity: 0}, {queue: false, duration: 740, complete: function() {
+            loadingScreen.slideDown(740).animate({opacity: 1}, {queue: false, duration: 740, complete: cb});
+        }});
+    }
+    
+    var linkEffects = function() {
+        console.log($('a'));
+        $('a').click(function(e) {
+            e.preventDefault();
+            unclearLoading(function() { window.location = $(e.target).closest('a').attr('href'); });
+        });
     };
     
     if (!loadQuery(function(q) { return query.g && query.s && (validServers.indexOf(query.s) != -1); }))
