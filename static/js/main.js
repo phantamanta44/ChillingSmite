@@ -34,9 +34,11 @@ $(document).ready(function() {
                 return;
             }
             Controls.paneError.remove();
-            requestFromApi(query.s, Endpoint.statsBySummoner, data.id, updateStats);
-            requestFromApi(query.s, Endpoint.gamesBySummoner, data.id, updateGames);
-            Controls.sIcon.attr('src', requestFromDd(DDPoint.summonerIcon, data.profileIconId + '.png'));
+            requestFromApi(query.s, Endpoint.statsBySummoner, data.id, null, updateStats);
+            requestFromApi(query.s, Endpoint.gamesBySummoner, data.id, null, updateGames);
+            getLatestDDVersion(query.s, function(ddVers) {
+                Controls.sIcon.attr('src', requestFromDd(DDPoint.summonerIcon, data.profileIconId + '.png', ddVers));
+            });
             Controls.sName.text(data.name);
             Controls.sLevel.text(levelText.supplant({lvl: data.summonerLevel}));
         }
@@ -71,8 +73,6 @@ $(document).ready(function() {
     var gpMapping = {};
     
     var aggregateStats = function() {
-        console.log(gameData);
-        console.log(games);
         $('#statLoading').hide();
         $('#statLoaded').show();
         var csData = {labels: [], datasets: [$.extend({}, {data: []}, lineStyling)]};
@@ -111,95 +111,100 @@ $(document).ready(function() {
         61: 'Team Builder 5v5', 65: 'Blind Pick ARAM', 70: 'One for All', 72: 'Showdown 1v1',
         73: 'Showdown 2v2', 75: 'SR Hexakill', 76: 'Ultra Rapid Fire', 83: 'URF Botmatch',
         91: 'Doom Bots', 92: 'Doom Bots', 93: 'Doom Bots',
-        96: 'Ascension', 98: 'TT Hexakill', 100: 'Butcher\'s Bridge ARAM',
-        300: 'King Poro', 310: 'Nemesis', 313: 'Black Market Brawlers'
+        96: 'Ascension', 98: 'Twisted Treeline Hexakill', 100: 'Butcher\'s Bridge ARAM',
+        300: 'King Poro', 310: 'Nemesis', 313: 'Black Market Brawlers',
+        400: 'Unranked Draft 5v5', 410: 'Ranked Draft 5v5'
     };
     var gameUrl = 'game.html?g={gid}&s={serv}&t={team}&c={cid}';
     
     var constructGameBlock = function(game, wGame) {
-        var block = $('#gameBlock' + game.gameId);
-        var players = {};
-        var rPlayersCopy = game.participants.concat();
-        var wPlayers = wGame.fellowPlayers;
-        for (var i = 0; i < wPlayers.length; i++) {
-            var wPlayer = wPlayers[i];
-            var team = wPlayer.teamId, champ = wPlayer.championId;
-            for (var j = 0; j < game.participants.length; j++) {
-                var rPlayer = game.participants[j];
-                if (rPlayer.teamId === team && rPlayer.championId === champ) {
-                    players[wPlayer.summonerId] = rPlayer;
-                    rPlayersCopy.splice(rPlayersCopy.indexOf(rPlayer), 1);
-                    break;
+        parseDDVersion(game.gameVersion, query.s, function(ddVers) {
+            c
+            var block = $('#gameBlock' + game.gameId);
+            var players = {};
+            var rPlayersCopy = game.participants.concat();
+            var wPlayers = wGame.fellowPlayers;
+            for (var i = 0; i < wPlayers.length; i++) {
+                var wPlayer = wPlayers[i];
+                var team = wPlayer.teamId, champ = wPlayer.championId;
+                for (var j = 0; j < game.participants.length; j++) {
+                    var rPlayer = game.participants[j];
+                    if (rPlayer.teamId === team && rPlayer.championId === champ) {
+                        players[wPlayer.summonerId] = rPlayer;
+                        rPlayersCopy.splice(rPlayersCopy.indexOf(rPlayer), 1);
+                        break;
+                    }
                 }
             }
-        }
-        var count = {100: 0, 200: 0};
-        for (var k = 0; k < rPlayersCopy.length; k++)
-            count[rPlayersCopy[k].teamId]++;
-        if (count[100] > 1)
-            thePlayer = players[data.id] = rPlayersCopy[count[100]];
-        else
-            thePlayer = players[data.id] = rPlayersCopy[0];
-            
-        gpMapping[game.gameId] = thePlayer;
-        
-        var won = wGame.stats.win;
-        var upperCont = gbUpper.supplant({outcome: won ? 'VICTORY' : 'DEFEAT'});
-        
-        var modSec = game.gameDuration % 60;
-        var gameTime = '{min}:{sec}'.supplant({min: (game.gameDuration - modSec) / 60, sec: modSec < 10 ? '0' + modSec : modSec});
-        var gameDate = new Date(game.gameCreation).toDateString().slice(3);
-        var kda = {k: wGame.stats.championsKilled || 0, d: wGame.stats.numDeaths || 0, a: wGame.stats.assists || 0};
-        kda.kdr = Math.round((kda.k + kda.a) / kda.d * 100) / 100;
-        kda.ratio = isNaN(kda.kdr) || kda.kdr === Infinity ? 'Perfect' : kda.kdr + ' : 1';
-        var creeps = (wGame.stats.minionsKilled || 0) + (wGame.stats.neutralMinionsKilled || 0);
-        var cpm = Math.round((creeps / game.gameDuration) * 6000) / 100;
-        var gameStats = gStats.supplant({kda: kdaFormat.supplant(kda), creeps: creeps, cpm: cpm});
-        var gold = wGame.stats.goldEarned;
-        var gpm = Math.round((gold / game.gameDuration) * 6000) / 100;
-        var gameStats2 = gStats2.supplant({level: wGame.stats.level, xpm: avg(thePlayer.timeline.xpPerMinDeltas), gold: gold, gpm: gpm});
-        var lowerCont = gbLower.supplant({gameTime: gameTime, gameDate: gameDate, gameMode: gameType[game.queueId], gStats: gameStats, gStats2: gameStats2});
-        
-        block.html(gbContent.supplant({upper: upperCont, lower: lowerCont}));
-        
-        block.find('.gameOutcome').css('background-color', won ? '#81c784' : '#e57373');
-        
-        requestFromApi(query.s, Endpoint.champion, thePlayer.championId, function(j1) {
-            block.find('.championLarge').attr('src', requestFromDd(DDPoint.championIcon, j1.key + '.png'));
-        });
-        requestFromApi(query.s, Endpoint.spell, thePlayer.spell1Id, function(j2) {
-            block.find('.summonerSpells').prepend($('<img>', {src: requestFromDd(DDPoint.spellIcon, j2.key + '.png')}));
-        });
-        requestFromApi(query.s, Endpoint.spell, thePlayer.spell2Id, function(j3) {
-            block.find('.summonerSpells').append($('<img>', {src: requestFromDd(DDPoint.spellIcon, j3.key + '.png')}));
-        });
-        for (var itemInd = 0; itemInd < 7; itemInd++) {
-            var itemId = thePlayer.stats['item' + itemInd];
-            if (itemId !== 0) {
-                var itemBlock = $('<img>', {src: requestFromDd(DDPoint.itemIcon, itemId + '.png')});
-                block.find('.gameItems').append(itemBlock);
-                requestFromApi(query.s, Endpoint.item, itemId, constructItemTooltip(itemBlock));
-            }
-            else if (itemInd === 6)
-                block.find('.gameItems').append($('<img>', {src: 'static/img/noTrinket.png'}));
+            var count = {100: 0, 200: 0};
+            for (var k = 0; k < rPlayersCopy.length; k++)
+                count[rPlayersCopy[k].teamId]++;
+            if (count[100] > 1)
+                thePlayer = players[data.id] = rPlayersCopy[count[100]];
             else
-                block.find('.gameItems').append($('<img>', {src: 'static/img/noItem.png'}));
-        }
-        
-        var detailsBtn = block.find('.detailsBtn');
-        (function(cPlayer) {
-            detailsBtn.click(function() {
-                document.location = gameUrl.supplant({gid: game.gameId, serv: query.s, team: cPlayer.teamId, cid: cPlayer.championId});
+                thePlayer = players[data.id] = rPlayersCopy[0];
+
+            gpMapping[game.gameId] = thePlayer;
+
+            var won = wGame.stats.win;
+            var upperCont = gbUpper.supplant({outcome: won ? 'VICTORY' : 'DEFEAT'});
+
+            var modSec = game.gameDuration % 60;
+            var gameTime = '{min}:{sec}'.supplant({min: (game.gameDuration - modSec) / 60, sec: modSec < 10 ? '0' + modSec : modSec});
+            var gameDate = new Date(game.gameCreation).toDateString().slice(3);
+            var kda = {k: wGame.stats.championsKilled || 0, d: wGame.stats.numDeaths || 0, a: wGame.stats.assists || 0};
+            kda.kdr = Math.round((kda.k + kda.a) / kda.d * 100) / 100;
+            kda.ratio = isNaN(kda.kdr) || kda.kdr === Infinity ? 'Perfect' : kda.kdr + ' : 1';
+            var creeps = (wGame.stats.minionsKilled || 0) + (wGame.stats.neutralMinionsKilled || 0);
+            var cpm = Math.round((creeps / game.gameDuration) * 6000) / 100;
+            var gameStats = gStats.supplant({kda: kdaFormat.supplant(kda), creeps: creeps, cpm: cpm});
+            var gold = wGame.stats.goldEarned;
+            var gpm = Math.round((gold / game.gameDuration) * 6000) / 100;
+            var gameStats2 = gStats2.supplant({level: wGame.stats.level, xpm: avg(thePlayer.timeline.xpPerMinDeltas), gold: gold, gpm: gpm});
+            var lowerCont = gbLower.supplant({gameTime: gameTime, gameDate: gameDate, gameMode: gameType[game.queueId], gStats: gameStats, gStats2: gameStats2});
+
+            block.html(gbContent.supplant({upper: upperCont, lower: lowerCont}));
+
+            block.find('.gameOutcome').css('background-color', won ? '#81c784' : '#e57373');
+
+            requestFromApi(query.s, Endpoint.champion, thePlayer.championId, {version: ddVers}, function(j1) {
+                block.find('.championLarge').attr('src', requestFromDd(DDPoint.championIcon, j1.key + '.png', ddVers));
             });
-        })(thePlayer);
-        
-        block.mouseenter(function(e) {
-            detailsBtn.stop();
-            detailsBtn.animate({width: '48px', height: '48px', 'font-size': '22px'}, 300);
-        });
-        block.mouseleave(function(e) {
-            detailsBtn.stop();
-            detailsBtn.animate({width: 0, height: 0, 'font-size': 0}, 300);
+            requestFromApi(query.s, Endpoint.spell, thePlayer.spell1Id, {version: ddVers}, function(j2) {
+                block.find('.summonerSpells').prepend($('<img>', {src: requestFromDd(DDPoint.spellIcon, j2.key + '.png', ddVers)}));
+            });
+            requestFromApi(query.s, Endpoint.spell, thePlayer.spell2Id, {version: ddVers}, function(j3) {
+                block.find('.summonerSpells').append($('<img>', {src: requestFromDd(DDPoint.spellIcon, j3.key + '.png', ddVers)}));
+            });
+            for (var itemInd = 0; itemInd < 7; itemInd++) {
+                var itemId = thePlayer.stats['item' + itemInd];
+                if (itemId !== 0) {
+                    var itemBlock = $('<img>', {src: requestFromDd(DDPoint.itemIcon, itemId + '.png', ddVers)});
+                    block.find('.gameItems').append(itemBlock);
+                    requestFromApi(query.s, Endpoint.item, itemId, {version: ddVers}, constructItemTooltip(itemBlock));
+                }
+                else if (itemInd === 6)
+                    block.find('.gameItems').append($('<img>', {src: 'static/img/noTrinket.png'}));
+                else
+                    block.find('.gameItems').append($('<img>', {src: 'static/img/noItem.png'}));
+            }
+
+            var detailsBtn = block.find('.detailsBtn');
+            (function(cPlayer) {
+                detailsBtn.click(function() {
+                    document.location = gameUrl.supplant({gid: game.gameId, serv: query.s, team: cPlayer.teamId, cid: cPlayer.championId});
+                });
+            })(thePlayer);
+
+            block.mouseenter(function(e) {
+                detailsBtn.stop();
+                detailsBtn.animate({width: '48px', height: '48px', 'font-size': '22px'}, 300);
+            });
+            block.mouseleave(function(e) {
+                detailsBtn.stop();
+                detailsBtn.animate({width: 0, height: 0, 'font-size': 0}, 300);
+            });
+            
         });
     };
     
@@ -280,14 +285,14 @@ $(document).ready(function() {
     
     var headerText = '<a href="http://{loc}" class="hiddenLink"><h2 id="headerLink">Chilling Smite</h2></a>';
     
-    if (!loadQuery())
+    if (!loadQuery(function(q) { return query.n && query.s && (validServers.indexOf(query.s) != -1); }))
         $('#secondpage').remove();
     else {
         $('#firstpage').remove();
         $('#qForm').prepend(headerText.supplant({loc: document.location.host + document.location.pathname}));
         Controls.qName.val(query.n);
         Controls.qServ.val(query.s);
-        requestFromApi(query.s, Endpoint.summonerByName, query.n, updatePage);
+        requestFromApi(query.s, Endpoint.summonerByName, query.n, null, updatePage);
     }
     
 });

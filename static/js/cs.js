@@ -23,7 +23,7 @@ var avg = function(values) {
 var query;
 var validServers = ['na', 'euw', 'eune', 'kr', 'oce', 'ru', 'tr', 'las', 'lan', 'br'];
 
-var loadQuery = function() {
+var loadQuery = function(pred) {
     query = {};
     var getRequest = document.location.search.slice(1);
     var pairs = getRequest.split('&');
@@ -31,7 +31,7 @@ var loadQuery = function() {
         var pair = pairs[i].split(/=(.+)/);
         query[pair[0]] = decodeURIComponent(pair[1]);
     }
-    return query.n && query.s && (validServers.indexOf(query.s) != -1);
+    return pred.call(null, query);
 };
 
 var cache;
@@ -63,12 +63,19 @@ var Endpoint = {
     gamesBySummoner: {vers: 'v1.3', url: 'https://{serv}.api.pvp.net/api/lol/{serv}/{vers}/game/by-summoner/{params}/recent'},
     champion: {vers: 'v1.2', url: 'https://global.api.pvp.net/api/lol/static-data/{serv}/{vers}/champion/{params}'},
     spell: {vers: 'v1.2', url: 'https://global.api.pvp.net/api/lol/static-data/{serv}/{vers}/summoner-spell/{params}'},
-    item: {vers: 'v1.2', url: 'https://global.api.pvp.net/api/lol/static-data/{serv}/{vers}/item/{params}'}
+    item: {vers: 'v1.2', url: 'https://global.api.pvp.net/api/lol/static-data/{serv}/{vers}/item/{params}'},
+    ddVers: {vers: 'v1.2', url: 'https://global.api.pvp.net/api/lol/static-data/{serv}/{vers}/versions/{params}'}
 };
 var baseRequest = '{req}?api_key={cache}';
+var queryParam = '&{key}={value}';
 
-var requestFromApi = function(serv, ept, params, cb) {
-    var request = baseRequest.supplant({req: ept.url.supplant({serv: serv, vers: ept.vers, params: params}), cache: getCachedData()});
+var requestFromApi = function(serv, ept, params, query, cb) {
+    var request = baseRequest.supplant({req: ept.url.supplant({serv: serv, vers: ept.vers, params: params !== null ? params : ''}), cache: getCachedData()});
+    if (query !== undefined && query !== null) {
+        $.each(query, function(k, v) {
+            request += queryParam.supplant({key: k, value: v});
+        });
+    }
     requestXml(request, cb);
 };
 
@@ -80,13 +87,39 @@ var DDPoint = {
 };
 var baseDataDragon = 'https://ddragon.leagueoflegends.com/cdn/{vers}/{ept}/{params}';
 var baseDataDragonStatic = 'http://ddragon.leagueoflegends.com/cdn/{ept}/{params}';
-var ddVers = '6.9.1';
 
-var requestFromDd = function(ept, params) {
+var requestFromDd = function(ept, params, ddVers) {
     var request = ept.staticReq ? baseDataDragonStatic : baseDataDragon;
     request = request.supplant({ept: ept.ept, params: encodeURIComponent(params), vers: ddVers});
     return request;
 };
+
+var parseDDVersion = function(gv, serv, cb) {
+    var parts = gv.split(/\./g);
+    var majorMinor = parts[0] + '.' + parts[1];
+    getDDVersions(serv, function(vList) {
+        cb.call(null, vList.filter(function(e) { return e.startsWith(majorMinor); })[0]);
+    });
+};
+
+var ddVersions = {};
+
+var getDDVersions = function(serv, cb) {
+    if (ddVersions[serv] === undefined) {
+        requestFromApi(serv, Endpoint.ddVers, null, null, function(vList) {
+            ddVersions[serv] = vList;
+            cb.call(null, vList);
+        });
+        return;
+    }
+    cb.call(null, ddVersions[serv]);
+}
+
+var getLatestDDVersion = function(serv, cb) {
+    getDDVersions(serv, function(vList) {
+        cb.call(null, vList[0]);
+    });
+}
 
 var baseAcsRequest = 'https://acs.leagueoflegends.com/{vers}/stats/game/{serv}/{gid}';
 var acsVers = 'v1';

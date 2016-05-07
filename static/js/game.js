@@ -32,6 +32,8 @@ $(document).ready(function() {
         });
     };
     
+    var ddVers;
+    
     var updatePage = function(rawJson) {
         if (!rawJson) {
             Controls.paneTop.remove();
@@ -48,37 +50,42 @@ $(document).ready(function() {
             $('#blueHeader').text(Team[100].win == 'Win' ? 'VICTORY' : 'DEFEAT');
             $('#redHeader').text(Team[200].win == 'Win' ? 'VICTORY' : 'DEFEAT');
             
-            populateMatchOverview();
-            
-            $.each(Players[100], function(i, obj) {
-                var block = $('<div>', {class: 'playerBlock'});
-                Controls.paneLeft.append(block);
-                constructPlayerBlock(block, obj, Participants[obj.participantId], data);
-            });
-            $.each(Players[200], function(i, obj) {
-                var block = $('<div>', {class: 'playerBlock'});
-                Controls.paneRight.append(block);
-                constructPlayerBlock(block, obj, Participants[obj.participantId], data);
-            });
-            
-            populateStats();
-            populateTimeline();
-            
-            $.each(queuedNames, function(i, id) {
-                requestFromApi(query.s, Endpoint.champion, id, function(j1) {
-                    var imgHtml = '<img src="' + requestFromDd(DDPoint.championIcon, j1.key + '.png') + '"/>';
-                    $('#gsHeader' + i).html(imgHtml);
-                    $('.tsHeader' + i).html(imgHtml);
+            parseDDVersion(data.gameVersion, query.s, function(ddVersion) {
+                ddVers = ddVersion;
+                
+                populateMatchOverview();
+
+                $.each(Players[100], function(i, obj) {
+                    var block = $('<div>', {class: 'playerBlock'});
+                    Controls.paneLeft.append(block);
+                    constructPlayerBlock(block, obj, Participants[obj.participantId], data);
                 });
-            });
-            
-            Controls.paneBot.children('div').find('.expBtn').click(function(e) {
-                var targetI = $(e.target);
-                var targetDiv = targetI.parent().parent();
-                targetDiv.children('.blockContents').slideToggle({duration: 800, queue: false});
-                targetDiv.toggleClass('hiddenSb');
-                targetI.toggleClass('fa-plus');
-                targetI.toggleClass('fa-minus');
+                $.each(Players[200], function(i, obj) {
+                    var block = $('<div>', {class: 'playerBlock'});
+                    Controls.paneRight.append(block);
+                    constructPlayerBlock(block, obj, Participants[obj.participantId], data);
+                });
+
+                populateStats();
+                populateTimeline();
+
+                $.each(queuedNames, function(i, id) {
+                    requestFromApi(query.s, Endpoint.champion, id, {version: ddVers}, function(j1) {
+                        var imgHtml = '<img src="' + requestFromDd(DDPoint.championIcon, j1.key + '.png', ddVers) + '"/>';
+                        $('#gsHeader' + i).html(imgHtml);
+                        $('.tsHeader' + i).html(imgHtml);
+                    });
+                });
+
+                Controls.paneBot.children('div').find('.expBtn').click(function(e) {
+                    var targetI = $(e.target);
+                    var targetDiv = targetI.parent().parent();
+                    targetDiv.children('.blockContents').slideToggle({duration: 800, queue: false});
+                    targetDiv.toggleClass('hiddenSb');
+                    targetI.toggleClass('fa-plus');
+                    targetI.toggleClass('fa-minus');
+                });
+                
             });
         }
     };
@@ -106,14 +113,16 @@ $(document).ready(function() {
         FIRSTBLOOD_2x2: 'Snowdown Showdown 2v2', SR_6x6: 'Summoners\' Rift Hexakill', URF_5x5: 'Ultra Rapid Fire', BOT_URF_5x5: 'Ultra Rapid Fire Botmatch',
         NIGHTMARE_BOT_5x5_RANK1: 'Rank 1 Doom Bots', NIGHTMARE_BOT_5x5_RANK2: 'Rank 2 Doom Bots', NIGHTMARE_BOT_5x5_RANK5: 'Rank 5 Doom Bots',
         ASCENSION_5x5: 'Ascension', HEXAKILL: 'Twisted Treeline Hexakill', BILGEWATER_ARAM_5x5: 'Butcher\'s Bridge ARAM',
-        KING_PORO_5x5: 'King Poro', COUNTER_PICK: 'Nemesis', BILGEWATER_5x5: 'Black Market Brawlers'
+        KING_PORO_5x5: 'King Poro', COUNTER_PICK: 'Nemesis', BILGEWATER_5x5: 'Black Market Brawlers',
+        TEAM_BUILDER_DRAFT_UNRANKED_5x5: 'Unranked Draft 5v5', TEAM_BUILDER_DRAFT_RANKED_5x5: 'Ranked Draft 5v5'
     };
     var queueType = {
         0: 'CUSTOM', 8: 'NORMAL_3x3', 2: 'NORMAL_5x5_BLIND', 14: 'NORMAL_5x5_DRAFT', 4: 'RANKED_SOLO_5x5', 6: 'RANKED_PREMADE_5x5', 9: 'RANKED_PREMADE_3x3',
         41: 'RANKED_TEAM_3x3', 42: 'RANKED_TEAM_5x5', 16: 'ODIN_5x5_BLIND', 17: 'ODIN_5x5_DRAFT', 7: 'BOT_5x5', 25: 'BOT_ODIN_5x5', 31: 'BOT_5x5_INTRO',
         32: 'BOT_5x5_BEGINNER', 33: 'BOT_5x5_INTERMEDIATE', 52: 'BOT_TT_3x3', 61: 'GROUP_FINDER_5x5', 65: 'ARAM_5x5', 70: 'ONEFORALL_5x5', 72: 'FIRSTBLOOD_1x1',
         73: 'FIRSTBLOOD_2x2', 75: 'SR_6x6', 76: 'URF_5x5', 83: 'BOT_URF_5x5', 91: 'NIGHTMARE_BOT_5x5_RANK1', 92: 'NIGHTMARE_BOT_5x5_RANK2', 93: 'NIGHTMARE_BOT_5x5_RANK5',
-        96: 'ASCENSION_5x5', 98: 'HEXAKILL', 100: 'BILGEWATER_ARAM_5x5', 300: 'KING_PORO_5x5', 310: 'COUNTER_PICK', 313: 'BILGEWATER_5x5'
+        96: 'ASCENSION_5x5', 98: 'HEXAKILL', 100: 'BILGEWATER_ARAM_5x5', 300: 'KING_PORO_5x5', 310: 'COUNTER_PICK', 313: 'BILGEWATER_5x5',
+        400: 'TEAM_BUILDER_DRAFT_UNRANKED_5x5', 410: 'TEAM_BUILDER_DRAFT_RANKED_5x5'
     };
     
     var populateMatchOverview = function() {
@@ -145,25 +154,22 @@ $(document).ready(function() {
         }));
     };
     
-    var pbContent = '<div class="gbLeft"><div class="champContainer"><img class="championLarge"/></div><span class="summonerName"></span>\
-        </div><div class="gbRight"><div class="gbUpper">{upper}</div><div class="gbLower">{lower}</div></div>';
+    var pbContent = '<div class="gbLeft"><div class="champContainer"><img class="championLarge"/></div><span class="summonerName"></span></div><div class="gbRight"><div class="gbUpper">{upper}</div><div class="gbLower">{lower}</div></div>';
     var pbUpper = '<div class="centerHelper"></div><div class="summonerSpells"></div><div class="gameItems"></div>';
     var pbLower = '<div class="gameStats">{gStats}</div><div class="gameStats">{gStats2}</div>';
-    var pStats = '<div class="gameKda"><img class="statIcon statScore" src="static/img/score.png"/><p>{kda}</p></div>\
-        <div class="gameCsStats"><img class="statIcon statMinion" src="static/img/minion.png"/><p>{creeps}<div class="pipeBreak">|</div>{cpm} CPM</p></div>';
+    var pStats = '<div class="gameKda"><img class="statIcon statScore" src="static/img/score.png"/><p>{kda}</p></div><div class="gameCsStats"><img class="statIcon statMinion" src="static/img/minion.png"/><p>{creeps}<div class="pipeBreak">|</div>{cpm} CPM</p></div>';
     var kdaFormat = '{k} / {d} / {a}<div class="pipeBreak">|</div>{ratio}';
-    var pStats2 = '<div class="gameLevel"><img class="statIcon statLevel" src="static/img/champion.png"/><p>Level {level}<div class="pipeBreak">|</div>{xpm} XPM</p></div>\
-        <div class="gameGold"><img class="statIcon statGold" src="static/img/gold.png"/><p>{gold}<div class="pipeBreak">|</div>{gpm} GPM</p></div>';
+    var pStats2 = '<div class="gameLevel"><img class="statIcon statLevel" src="static/img/champion.png"/><p>Level {level}<div class="pipeBreak">|</div>{xpm} XPM</p></div><div class="gameGold"><img class="statIcon statGold" src="static/img/gold.png"/><p>{gold}<div class="pipeBreak">|</div>{gpm} GPM</p></div>';
     
     var constructPlayerBlock = function(block, player, ident, game) {
         var kda = {k: player.stats.kills || 0, d: player.stats.deaths || 0, a: player.stats.assists || 0};
         kda.kdr = Math.round((kda.k + kda.a) / kda.d * 100) / 100;
         kda.ratio = isNaN(kda.kdr) || kda.kdr === Infinity ? 'Perfect' : kda.kdr + ' : 1';
         var creeps = (player.stats.totalMinionsKilled || 0) + (player.stats.neutralMinionsKilled || 0);
-        var cpm = Math.round((creeps / game.matchDuration) * 6000) / 100;
+        var cpm = Math.round((creeps / game.gameDuration) * 6000) / 100;
         var gameStats = pStats.supplant({kda: kdaFormat.supplant(kda), creeps: creeps, cpm: cpm});
         var gold = player.stats.goldEarned;
-        var gpm = Math.round((gold / game.matchDuration) * 6000) / 100;
+        var gpm = Math.round((gold / game.gameDuration) * 6000) / 100;
         var gameStats2 = pStats2.supplant({level: player.stats.champLevel, xpm: avg(player.timeline.xpPerMinDeltas), gold: gold, gpm: gpm});
         var lowerCont = pbLower.supplant({gStats: gameStats, gStats2: gameStats2});
         
@@ -180,28 +186,28 @@ $(document).ready(function() {
         else
             noIdentity = true;
         
-        requestFromApi(query.s, Endpoint.champion, player.championId, function(j1) {
-            block.find('.championLarge').attr('src', requestFromDd(DDPoint.championIcon, j1.key + '.png'));
+        requestFromApi(query.s, Endpoint.champion, player.championId, {version: ddVers}, function(j1) {
+            block.find('.championLarge').attr('src', requestFromDd(DDPoint.championIcon, j1.key + '.png', ddVers));
             if (noIdentity) {
                 block.find('.summonerName').text(j1.name);
                 appendRank(player, block);
             }
         });
         
-        requestFromApi(query.s, Endpoint.spell, player.spell1Id, function(j2) {
-            block.find('.summonerSpells').prepend($('<img>', {src: requestFromDd(DDPoint.spellIcon, j2.key + '.png')}));
+        requestFromApi(query.s, Endpoint.spell, player.spell1Id, {version: ddVers}, function(j2) {
+            block.find('.summonerSpells').prepend($('<img>', {src: requestFromDd(DDPoint.spellIcon, j2.key + '.png', ddVers)}));
         });
         
-        requestFromApi(query.s, Endpoint.spell, player.spell2Id, function(j3) {
-            block.find('.summonerSpells').append($('<img>', {src: requestFromDd(DDPoint.spellIcon, j3.key + '.png')}));
+        requestFromApi(query.s, Endpoint.spell, player.spell2Id, {version: ddVers}, function(j3) {
+            block.find('.summonerSpells').append($('<img>', {src: requestFromDd(DDPoint.spellIcon, j3.key + '.png', ddVers)}));
         });
         
         for (var itemInd = 0; itemInd < 7; itemInd++) {
             var itemId = player.stats['item' + itemInd];
             if (itemId !== 0) {
-                var itemBlock = $('<img>', {src: requestFromDd(DDPoint.itemIcon, itemId + '.png')});
+                var itemBlock = $('<img>', {src: requestFromDd(DDPoint.itemIcon, itemId + '.png', ddVers)});
                 block.find('.gameItems').append(itemBlock);
-                requestFromApi(query.s, Endpoint.item, itemId, constructItemTooltip(itemBlock));
+                requestFromApi(query.s, Endpoint.item, itemId, {version: ddVers}, constructItemTooltip(itemBlock));
             }
             else if (itemInd === 6)
                 block.find('.gameItems').append($('<img>', {src: 'static/img/noTrinket.png'}));
@@ -258,7 +264,7 @@ $(document).ready(function() {
                 sTable[4].push(player.stats.killingSprees);
                 sTable[5].push(player.stats.largestKillingSpree);
                 sTable[6].push(player.stats.largestMultiKill);
-                sTable[7].push(player.stats.towerKills);
+                sTable[7].push(player.stats.turretKills);
                 sTable[8].push(player.stats.inhibitorKills);
                 sTable[9].push(player.stats.firstBloodKill ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>');
                 sTable[11].push(player.stats.physicalDamageDealt);
@@ -272,7 +278,7 @@ $(document).ready(function() {
                 sTable[19].push(player.stats.totalTimeCrowdControlDealt + ' Sec');
                 sTable[20].push(player.stats.largestCriticalStrike);
                 sTable[22].push(player.stats.physicalDamageTaken);
-                sTable[23].push(player.stats.magicDamageTaken);
+                sTable[23].push(player.stats.magicalDamageTaken);
                 sTable[24].push(player.stats.trueDamageTaken);
                 sTable[25].push(player.stats.totalDamageTaken);
                 sTable[26].push(player.stats.totalHeal);
@@ -282,9 +288,9 @@ $(document).ready(function() {
                 sTable[31].push(player.stats.sightWardsBoughtInGame);
                 sTable[33].push(player.stats.goldEarned);
                 sTable[34].push(player.stats.goldSpent);
-                sTable[35].push(player.stats.minionsKilled);
+                sTable[35].push(player.stats.totalMinionsKilled - player.stats.neutralMinionsKilled);
                 sTable[36].push(player.stats.neutralMinionsKilled);
-                sTable[37].push(player.stats.minionsKilled + player.stats.neutralMinionsKilled);
+                sTable[37].push(player.stats.totalMinionsKilled);
                 sTable[38].push(player.stats.neutralMinionsKilledTeamJungle);
                 sTable[39].push(player.stats.neutralMinionsKilledEnemyJungle);
             });
@@ -306,11 +312,12 @@ $(document).ready(function() {
         ['CS Per Minute'], ['Gold Per Minute'], ['XP Per Minute'], ['Damage Taken Per Minute']
     ];
     var tTable = {
-        zeroToTen: $.extend(true, {}, tTableTemplate),
-        tenToTwenty: $.extend(true, {}, tTableTemplate),
-        twentyToThirty: $.extend(true, {}, tTableTemplate),
-        thirtyToEnd: $.extend(true, {}, tTableTemplate)
+        '0-10': $.extend(true, {}, tTableTemplate),
+        '10-20': $.extend(true, {}, tTableTemplate),
+        '20-30': $.extend(true, {}, tTableTemplate),
+        '30-end': $.extend(true, {}, tTableTemplate)
     };
+    var tlVals = ['0-10', '10-20', '20-30', '30-end'];
     
     var populateTimeline = function() {
         $.each(Players, function(arrayKey, array) {
@@ -396,7 +403,8 @@ $(document).ready(function() {
     
     var headerText = '<a href="http://{loc}" class="hiddenLink"><h2 id="headerLink">Chilling Smite</h2></a>';
     
-    if (!loadQuery())
+    
+    if (!loadQuery(function(q) { return query.g && query.s && (validServers.indexOf(query.s) != -1); }))
         window.location = 'index.html';
     else {
         $('#qForm').prepend(headerText.supplant({loc: document.location.host + document.location.pathname}));
