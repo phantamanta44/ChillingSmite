@@ -366,9 +366,21 @@ select {
 }
 
 .expBtn {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
     float: right;
     margin-top: 2px;
     cursor: pointer;
+}
+
+.expVert {
+    transform: rotateZ(90deg);
+    transition: transform 0.25s;
+}
+
+.expVert.expBtnTurnt {
+    transform: rotateZ(180deg);
 }
 
 #statBlock1 {

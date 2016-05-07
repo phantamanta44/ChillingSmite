@@ -80,11 +80,10 @@ $(document).ready(function() {
 
                 Controls.paneBot.children('div').find('.expBtn').click(function(e) {
                     var targetI = $(e.target);
-                    var targetDiv = targetI.parent().parent();
-                    targetDiv.children('.blockContents').slideToggle({duration: 800, queue: false});
+                    var targetDiv = targetI.parent().parent().parent();
+                    targetDiv.children('.blockContents').stop().slideToggle({duration: 800, queue: false});
                     targetDiv.toggleClass('hiddenSb');
-                    targetI.toggleClass('fa-plus');
-                    targetI.toggleClass('fa-minus');
+                    targetI.parent().find('.expVert').toggleClass('expBtnTurnt');
                 });
                 
                 clearLoading();

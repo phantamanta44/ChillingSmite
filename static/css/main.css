@@ -252,15 +252,18 @@ select {
 }
 
 .detailsBtn {
+    width: 48px;
+    height: 48px;
     position: absolute;
     top: 50%;
     right: 0;
-    transform: translate(50%, -50%);
-    font-size: 0;
+    transform: translate(50%, -50%) rotateY(90deg);
+    font-size: 22px;
     background-color: #2196f3;
     border-radius: 100%;
     box-shadow: 0 2px 8px 1px #999;
     cursor: pointer;
+    transition: transform 0.3s;
 }
 
 .detailsBtn:before {
@@ -268,11 +271,30 @@ select {
     display: inline-block;
     height: 100%;
     vertical-align: middle;
+    z-index: 1;
 }
 
 .detailsBtn i {
     vertical-align: middle;
     color: #e9e9e9;
+}
+
+.detailsBtn:after {
+    content: '';
+    width: 24px;
+    height: 48px;
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-top-right-radius: 24px;
+    border-bottom-right-radius: 24px;
+    background-color: #42A5F5;
+    z-index: -1;
+}
+
+.detailsBtn.detailsOn {
+    transform: translate(50%, -50%) rotateY(0);
 }
 
 .gbUpper, .gbLower {

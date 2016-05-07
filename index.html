@@ -5,9 +5,11 @@
         <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Ek+Mukta:300">
         <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Lobster">
         <link href='https://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" type="text/css" href="static/css/transform.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
         <link rel="stylesheet" type="text/css" href="static/css/main.css">
         <script src="static/js/jquery-2.1.4.min.js"></script>
+        <script src="static/js/transform.js"></script>
         <script src="static/js/b64.js"></script>
         <script src="static/js/chart.js"></script>
         <script src="static/js/cs.js"></script>
@@ -50,7 +52,9 @@
                         <div class="paneContainer" id="leftPaneContainer">
                             <h2>Stats</h2>
                             <div id="statLoading">
-                                <i class="fa fa-circle-o-notch fa-spin"></i>
+                                <span class="tcon-loader--spinner360 darker" aria-label="loading" style="display: inline-block;">
+                                    <span class="tcon-visuallyhidden">loading</span>
+                                </span>
                             </div>
                             <div id="statLoaded">
                                 <div class="statBlock">
@@ -60,10 +64,6 @@
                                 <div class="statBlock">
                                     <h3>Warding</h3>
                                     <canvas class="statChart" id="wardChart"></canvas>
-                                </div>
-                                <div class="statBlock">
-                                    <h3>Dolor Set Amet</h3>
-                                    <canvas class="statChart" id="anotherChart"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -78,7 +78,9 @@
         </div>
         <div id="loadingScreen">
             <div id="loadingSpinner">
-                <i class="fa fa-circle-o-notch fa-spin"></i>
+                <span class="tcon-loader--spinner360" aria-label="loading">
+                    <span class="tcon-visuallyhidden">loading</span>
+                </span>
             </div>
         </div>
         <div id="tooltip">Lorem ipsum dolor set amet</div>

@@ -198,12 +198,10 @@ $(document).ready(function() {
             })(thePlayer);
 
             block.mouseenter(function(e) {
-                detailsBtn.stop();
-                detailsBtn.animate({width: '48px', height: '48px', 'font-size': '22px'}, 300);
+                detailsBtn.addClass('detailsOn');
             });
             block.mouseleave(function(e) {
-                detailsBtn.stop();
-                detailsBtn.animate({width: 0, height: 0, 'font-size': 0}, 300);
+                detailsBtn.removeClass('detailsOn');
             });
             
         });

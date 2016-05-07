@@ -4,9 +4,11 @@
         <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Ek+Mukta:300">
         <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Lobster">
         <link href='https://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" type="text/css" href="static/css/transform.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
         <link rel="stylesheet" type="text/css" href="static/css/game.css">
         <script src="static/js/jquery-2.1.4.min.js"></script>
+        <script src="static/js/transform.js"></script>
         <script src="static/js/chart.js"></script>
         <script src="static/js/b64.js"></script>
         <script src="static/js/cs.js"></script>
@@ -52,13 +54,25 @@
             <div id="bottomPane" class="fullPane">
                 <h2 id="statsHeader" class="paneHeader">Match Information</h2>
                 <div id="statBlock1" class="hiddenSb">
-                    <h2>General Statistics<i class="fa fa-plus expBtn"></i></h2>
+                    <h2>
+                        General Statistics
+                        <span class="fa-stack expBtn">
+                            <i class="fa fa-minus expVert fa-stack-1x"></i>
+                            <i class="fa fa-minus fa-stack-1x"></i>
+                        </span>
+                    </h2>
                     <div class="blockContents">
                         <table id="gsTable"></table>
                     </div>
                 </div>
                 <div id="statBlock2" class="hiddenSb">
-                    <h2>Comparison Over Time<i class="fa fa-plus expBtn"></i></h2>
+                    <h2>
+                        Comparison Over Time
+                        <span class="fa-stack expBtn">
+                            <i class="fa fa-minus expVert fa-stack-1x"></i>
+                            <i class="fa fa-minus fa-stack-1x"></i>
+                        </span>
+                    </h2>
                     <div class="blockContents">
                         <div id="tsTabs">
                             <div id="tsTable1">0&ndash;10 Minutes</div>
@@ -73,22 +87,36 @@
                     </div>
                 </div>
                 <div id="statBlock3" class="hiddenSb">
-                    <h2>Team Information<i class="fa fa-plus expBtn"></i></h2>
+                    <h2>
+                        Team Information
+                        <span class="fa-stack expBtn">
+                            <i class="fa fa-minus expVert fa-stack-1x"></i>
+                            <i class="fa fa-minus fa-stack-1x"></i>
+                        </span>
+                    </h2>
                     <div class="blockContents">
-                        Lorem ipsum dolor set amet consectetur adipiscing elit sed do eiusmod tempor...
+                        <p style="background: repeating-linear-gradient(45deg, #FFEB3B, #FFEB3B 5%, #424242 5%, #424242 10%); color: #000000; font-weight: bold;">[UNDER CONSTRUCTION]</p>
                     </div>
                 </div>
                 <div id="statBlock4" class="hiddenSb">
-                    <h2>Build Orders<i class="fa fa-plus expBtn"></i></h2>
+                    <h2>
+                        Build Orders
+                        <span class="fa-stack expBtn">
+                            <i class="fa fa-minus expVert fa-stack-1x"></i>
+                            <i class="fa fa-minus fa-stack-1x"></i>
+                        </span>
+                    </h2>
                     <div class="blockContents">
-                        Lorem ipsum dolor set amet consectetur adipiscing elit sed do eiusmod tempor...
+                        <p style="background: repeating-linear-gradient(45deg, #FFEB3B, #FFEB3B 5%, #424242 5%, #424242 10%); color: #000000; font-weight: bold;">[UNDER CONSTRUCTION]</p>
                     </div>
                 </div>
             </div>
         </div>
         <div id="loadingScreen">
             <div id="loadingSpinner">
-                <i class="fa fa-circle-o-notch fa-spin"></i>
+                <span class="tcon-loader--spinner360" aria-label="loading">
+                    <span class="tcon-visuallyhidden">loading</span>
+                </span>
             </div>
         </div>
         <div id="tooltip">Lorem ipsum dolor set amet</div>
