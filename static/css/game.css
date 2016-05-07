@@ -39,6 +39,32 @@ hr {
     color: #8d8d8d;
 }
 
+#pageWrapper, #loadingScreen {
+    position: relative;
+}
+
+#pageWrapper {
+    display: none;
+    opacity: 0;
+}
+
+#loadingScreen {
+    width: 100%;
+    height: 174px;
+}
+
+#loadingSpinner {
+    width: 114px;
+    height: 114px;
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 80px;
+    color: #2196F3;
+}
+
 #headerLink {
     display: inline-block;
     margin: 0;

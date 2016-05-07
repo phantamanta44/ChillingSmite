@@ -15,11 +15,11 @@
         <title>Chilling Smite</title>
     </head>
     <body>
-        <div id="firstpage" class="page">
-            <h1>Chilling Smite</h1>
-        </div>
         <div id="nodeCache" title="e5cefd178d76fb97f56bee3c783fbcd5bdfef38d38f37dfbd75dc1"></div>
-        <div id="qForm">
+        <div id="firstpage" class="page">
+                <h1>Chilling Smite</h1>
+            </div>
+            <div id="qForm">
                 <input type="text" id="inputName" placeholder="Summoner Name">
                 <select id="inputServ">
                     <option value="na">North America</option>
@@ -35,43 +35,50 @@
                 </select>
                 <button id="submit"><i class="fa fa-search"></i></button>
             </div>
-        <div id="secondpage" class="page">
-            <div id="errorPane" class="fullPane"></div>
-            <div id="leftPane" class="dualPanes">
-                <div id="leftPaneTop" class="umPane">
-                    <img id="profileIcon" class="summonerIcon"/>
-                    <div id="summonerStats">
-                        <div id="theSummonerName"></div>
-                        <div id="theSummonerLevel"></div>
+        <div id="pageWrapper">
+            <div id="secondpage" class="page">
+                <div id="errorPane" class="fullPane"></div>
+                <div id="leftPane" class="dualPanes">
+                    <div id="leftPaneTop" class="umPane">
+                        <img id="profileIcon" class="summonerIcon"/>
+                        <div id="summonerStats">
+                            <div id="theSummonerName"></div>
+                            <div id="theSummonerLevel"></div>
+                        </div>
+                    </div>
+                    <div id="leftPaneBot" class="umPane">
+                        <div class="paneContainer" id="leftPaneContainer">
+                            <h2>Stats</h2>
+                            <div id="statLoading">
+                                <i class="fa fa-circle-o-notch fa-spin"></i>
+                            </div>
+                            <div id="statLoaded">
+                                <div class="statBlock">
+                                    <h3>Creep Score Per Minute</h3>
+                                    <canvas class="statChart" id="csChart"></canvas>
+                                </div>
+                                <div class="statBlock">
+                                    <h3>Warding</h3>
+                                    <canvas class="statChart" id="wardChart"></canvas>
+                                </div>
+                                <div class="statBlock">
+                                    <h3>Dolor Set Amet</h3>
+                                    <canvas class="statChart" id="anotherChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div id="leftPaneBot" class="umPane">
-                    <div class="paneContainer" id="leftPaneContainer">
-                        <h2>Stats</h2>
-                        <div id="statLoading">
-                            <i class="fa fa-circle-o-notch fa-spin"></i>
-                        </div>
-                        <div id="statLoaded">
-                            <div class="statBlock">
-                                <h3>Creep Score Per Minute</h3>
-                                <canvas class="statChart" id="csChart"></canvas>
-                            </div>
-                            <div class="statBlock">
-                                <h3>Warding</h3>
-                                <canvas class="statChart" id="wardChart"></canvas>
-                            </div>
-                            <div class="statBlock">
-                                <h3>Dolor Set Amet</h3>
-                                <canvas class="statChart" id="anotherChart"></canvas>
-                            </div>
-                        </div>
+                <div id="rightPane" class="dualPanes">
+                    <div class="paneContainer" id="rightPaneContainer">
+                        <h2>Recent Games</h2>
                     </div>
                 </div>
             </div>
-            <div id="rightPane" class="dualPanes">
-                <div class="paneContainer" id="rightPaneContainer">
-                    <h2>Recent Games</h2>
-                </div>
+        </div>
+        <div id="loadingScreen">
+            <div id="loadingSpinner">
+                <i class="fa fa-circle-o-notch fa-spin"></i>
             </div>
         </div>
         <div id="tooltip">Lorem ipsum dolor set amet</div>

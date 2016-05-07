@@ -41,6 +41,7 @@ $(document).ready(function() {
             Controls.paneRight.remove();
             Controls.paneBot.remove();
             Controls.paneError.text('Game not found!');
+            clearLoading();
         }
         else {
             data = rawJson;
@@ -86,6 +87,7 @@ $(document).ready(function() {
                     targetI.toggleClass('fa-minus');
                 });
                 
+                clearLoading();
             });
         }
     };
@@ -403,6 +405,12 @@ $(document).ready(function() {
     
     var headerText = '<a href="http://{loc}" class="hiddenLink"><h2 id="headerLink">Chilling Smite</h2></a>';
     
+    var loadingScreen = $('#loadingScreen');
+    var clearLoading = function() {
+        loadingScreen.slideUp(740).animate({opacity: 0}, {queue: false, duration: 740, complete: function() {
+            $('#pageWrapper').slideDown(740).animate({opacity: 1}, {queue: false, duration: 740});
+        }});
+    };
     
     if (!loadQuery(function(q) { return query.g && query.s && (validServers.indexOf(query.s) != -1); }))
         window.location = 'index.html';

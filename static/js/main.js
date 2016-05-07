@@ -24,6 +24,7 @@ $(document).ready(function() {
             Controls.paneLeft.remove();
             Controls.paneRight.parent().remove();
             Controls.paneError.text('Summoner not found!');
+            clearLoading();
         }
         else {
             data = rawJson[query.n.toLowerCase().replace(/\s/g, '')];
@@ -41,6 +42,7 @@ $(document).ready(function() {
             });
             Controls.sName.text(data.name);
             Controls.sLevel.text(levelText.supplant({lvl: data.summonerLevel}));
+            clearLoading();
         }
     };
     
@@ -119,7 +121,6 @@ $(document).ready(function() {
     
     var constructGameBlock = function(game, wGame) {
         parseDDVersion(game.gameVersion, query.s, function(ddVers) {
-            c
             var block = $('#gameBlock' + game.gameId);
             var players = {};
             var rPlayersCopy = game.participants.concat();
@@ -285,8 +286,17 @@ $(document).ready(function() {
     
     var headerText = '<a href="http://{loc}" class="hiddenLink"><h2 id="headerLink">Chilling Smite</h2></a>';
     
-    if (!loadQuery(function(q) { return query.n && query.s && (validServers.indexOf(query.s) != -1); }))
+    var loadingScreen = $('#loadingScreen');
+    var clearLoading = function() {
+        loadingScreen.slideUp(740).animate({opacity: 0}, {queue: false, duration: 740, complete: function() {
+            $('#pageWrapper').slideDown(740).animate({opacity: 1}, {queue: false, duration: 740});
+        }});
+    };
+    
+    if (!loadQuery(function(q) { return query.n && query.s && (validServers.indexOf(query.s) != -1); })) {
         $('#secondpage').remove();
+        loadingScreen.remove();
+    }
     else {
         $('#firstpage').remove();
         $('#qForm').prepend(headerText.supplant({loc: document.location.host + document.location.pathname}));

@@ -16,72 +16,79 @@
     <body>
         <div id="nodeCache" title="e5cefd178d76fb97f56bee3c783fbcd5bdfef38d38f37dfbd75dc1"></div>
         <div id="qForm">
-                <input type="text" id="inputName" placeholder="Summoner Name">
-                <select id="inputServ">
-                    <option value="na">North America</option>
-                    <option value="euw">Europe West</option>
-                    <option value="eune">Europe Nordic/East</option>
-                    <option value="kr">Korea</option>
-                    <option value="oce">Oceania</option>
-                    <option value="ru">Russia</option>
-                    <option value="tr">Turkey</option>
-                    <option value="las">Latin America South</option>
-                    <option value="lan">Latin America North</option>
-                    <option value="br">Brazil</option>
-                </select>
-                <button id="submit"><i class="fa fa-search"></i></button>
-            </div>
-        <div id="errorPane" class="fullPane"></div>
-        <div id="topPane" class="fullPane">
-            <h2 id="statsHeader" class="paneHeader">Overview</h2>
-            <div class="flexContainer">
-                <div id="ovTimestamp"></div>
-                <div id="ovServ"></div>
-                <div id="ovGamemode"></div>
-                <div id="ovLength"></div>
-                <div id="ovScore"></div>
-            </div>
+            <input type="text" id="inputName" placeholder="Summoner Name">
+            <select id="inputServ">
+                <option value="na">North America</option>
+                <option value="euw">Europe West</option>
+                <option value="eune">Europe Nordic/East</option>
+                <option value="kr">Korea</option>
+                <option value="oce">Oceania</option>
+                <option value="ru">Russia</option>
+                <option value="tr">Turkey</option>
+                <option value="las">Latin America South</option>
+                <option value="lan">Latin America North</option>
+                <option value="br">Brazil</option>
+            </select>
+            <button id="submit"><i class="fa fa-search"></i></button>
         </div>
-        <div id="leftPane" class="dualPanes">
-            <h2 id="blueHeader" class="paneHeader"></h2>
-        </div>
-        <div id="rightPane" class="dualPanes">
-            <h2 id="redHeader" class="paneHeader"></h2>
-        </div>
-        <div id="bottomPane" class="fullPane">
-            <h2 id="statsHeader" class="paneHeader">Match Information</h2>
-            <div id="statBlock1" class="hiddenSb">
-                <h2>General Statistics<i class="fa fa-plus expBtn"></i></h2>
-                <div class="blockContents">
-                    <table id="gsTable"></table>
+        <div id="pageWrapper">
+            <div id="errorPane" class="fullPane"></div>
+            <div id="topPane" class="fullPane">
+                <h2 id="statsHeader" class="paneHeader">Overview</h2>
+                <div class="flexContainer">
+                    <div id="ovTimestamp"></div>
+                    <div id="ovServ"></div>
+                    <div id="ovGamemode"></div>
+                    <div id="ovLength"></div>
+                    <div id="ovScore"></div>
                 </div>
             </div>
-            <div id="statBlock2" class="hiddenSb">
-                <h2>Comparison Over Time<i class="fa fa-plus expBtn"></i></h2>
-                <div class="blockContents">
-                    <div id="tsTabs">
-                        <div id="tsTable1">0&ndash;10 Minutes</div>
-                        <div id="tsTable2">10&ndash;20 Minutes</div>
-                        <div id="tsTable3">20&ndash;30 Minutes</div>
-                        <div id="tsTable4">30+ Minutes</div>
+            <div id="leftPane" class="dualPanes">
+                <h2 id="blueHeader" class="paneHeader"></h2>
+            </div>
+            <div id="rightPane" class="dualPanes">
+                <h2 id="redHeader" class="paneHeader"></h2>
+            </div>
+            <div id="bottomPane" class="fullPane">
+                <h2 id="statsHeader" class="paneHeader">Match Information</h2>
+                <div id="statBlock1" class="hiddenSb">
+                    <h2>General Statistics<i class="fa fa-plus expBtn"></i></h2>
+                    <div class="blockContents">
+                        <table id="gsTable"></table>
                     </div>
-                    <table id="tsTable1t" class="tsTable"></table>
-                    <table id="tsTable2t" class="tsTable"></table>
-                    <table id="tsTable3t" class="tsTable"></table>
-                    <table id="tsTable4t" class="tsTable"></table>
+                </div>
+                <div id="statBlock2" class="hiddenSb">
+                    <h2>Comparison Over Time<i class="fa fa-plus expBtn"></i></h2>
+                    <div class="blockContents">
+                        <div id="tsTabs">
+                            <div id="tsTable1">0&ndash;10 Minutes</div>
+                            <div id="tsTable2">10&ndash;20 Minutes</div>
+                            <div id="tsTable3">20&ndash;30 Minutes</div>
+                            <div id="tsTable4">30+ Minutes</div>
+                        </div>
+                        <table id="tsTable1t" class="tsTable"></table>
+                        <table id="tsTable2t" class="tsTable"></table>
+                        <table id="tsTable3t" class="tsTable"></table>
+                        <table id="tsTable4t" class="tsTable"></table>
+                    </div>
+                </div>
+                <div id="statBlock3" class="hiddenSb">
+                    <h2>Team Information<i class="fa fa-plus expBtn"></i></h2>
+                    <div class="blockContents">
+                        Lorem ipsum dolor set amet consectetur adipiscing elit sed do eiusmod tempor...
+                    </div>
+                </div>
+                <div id="statBlock4" class="hiddenSb">
+                    <h2>Build Orders<i class="fa fa-plus expBtn"></i></h2>
+                    <div class="blockContents">
+                        Lorem ipsum dolor set amet consectetur adipiscing elit sed do eiusmod tempor...
+                    </div>
                 </div>
             </div>
-            <div id="statBlock3" class="hiddenSb">
-                <h2>Team Information<i class="fa fa-plus expBtn"></i></h2>
-                <div class="blockContents">
-                    Lorem ipsum dolor set amet consectetur adipiscing elit sed do eiusmod tempor...
-                </div>
-            </div>
-            <div id="statBlock4" class="hiddenSb">
-                <h2>Build Orders<i class="fa fa-plus expBtn"></i></h2>
-                <div class="blockContents">
-                    Lorem ipsum dolor set amet consectetur adipiscing elit sed do eiusmod tempor...
-                </div>
+        </div>
+        <div id="loadingScreen">
+            <div id="loadingSpinner">
+                <i class="fa fa-circle-o-notch fa-spin"></i>
             </div>
         </div>
         <div id="tooltip">Lorem ipsum dolor set amet</div>
