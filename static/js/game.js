@@ -260,16 +260,30 @@ $(document).ready(function() {
         ['Allied Jungle Score'], ['Enemy Jungle Score']
     ];
     var queuedNames = [];
-    var roles = {NONE: 'None', DUO: 'Duo Lane', SOLO: 'Solo Lane', DUO_CARRY: 'ADC', DUO_SUPPORT: 'Support'};
-    var lanes = {TOP: 'Top', MID: 'Middle', MIDDLE: 'Middle', BOT: 'Bottom', BOTTOM: 'Bottom', JUNGLE: 'Jungle'};
+    var lanes = ['Top', 'Middle', 'Bottom', 'Jungle'];
+    var laneIndMap = {TOP: 0, MID: 1, MIDDLE: 1, BOT: 2, BOTTOM: 2, JUNGLE: 3};
+    var roles = {
+        NONE: ['None', 'None', 'None', 'Jungler'],
+        DUO: ['Duo Top', 'Duo Mid', 'Duo Bot', 'Roam'],
+        SOLO: ['Top Laner', 'Mid Laner', 'Bot Laner', 'Roam'],
+        DUO_CARRY: 'ADC',
+        DUO_SUPPORT: 'Support'
+    };
+    
+    var parseRole = function(roleEnum, pl) {
+        var role = roles[roleEnum];
+        if (typeof role == 'string')
+            return role;
+        return role[laneIndMap[pl.timeline.lane]];
+    }
     
     var populateStats = function() {
         $.each(Players, function(arrayKey, array) {
             $.each(array, function(i, player) {
                 sTable[0].push('<div id="gsHeader{i}">Summoner {i}</div>'.supplant({i: i + (arrayKey == 200 ? 5 : 0)}));
                 queuedNames.push(player.championId);
-                sTable[1].push(lanes[player.timeline.lane]);
-                sTable[2].push(roles[player.timeline.role]);
+                sTable[1].push(lanes[laneIndMap[player.timeline.lane]]);
+                sTable[2].push(parseRole(player.timeline.role, player));
                 sTable[4].push(player.stats.killingSprees);
                 sTable[5].push(player.stats.largestKillingSpree);
                 sTable[6].push(player.stats.largestMultiKill);
@@ -333,8 +347,8 @@ $(document).ready(function() {
             $.each(array, function(pInd, player) {
                 $.each(tTable, function(k, t) {
                     t[0].push('<div class="tsHeader{i}">Summoner {i}</div>'.supplant({i: pInd + (arrayKey == 200 ? 5 : 0)}));
-                    t[1].push(lanes[player.timeline.lane]);
-                    t[2].push(roles[player.timeline.role]);
+                    t[1].push(lanes[laneIndMap[player.timeline.lane]]);
+                    t[2].push(parseRole(player.timeline.role, player));
                     t[4].push(Math.round(player.timeline.creepsPerMinDeltas[k] * 100) / 100);
                     t[5].push(Math.round(player.timeline.goldPerMinDeltas[k] * 100) / 100);
                     t[6].push(Math.round(player.timeline.xpPerMinDeltas[k] * 100) / 100);
