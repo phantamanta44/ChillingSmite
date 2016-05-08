@@ -203,13 +203,25 @@ $(document).ready(function() {
             }
         });
         
-        requestFromApi(query.s, Endpoint.spell, player.spell1Id, {version: ddVers}, function(j2) {
-            block.find('.summonerSpells').prepend($('<img>', {src: requestFromDd(DDPoint.spellIcon, j2.key + '.png', ddVers)}));
-        });
+        if (player.spell1Id !== 0) {
+            requestFromApi(query.s, Endpoint.spell, player.spell1Id, {version: ddVers}, function(j2) {
+                var spellBlk = $('<img>', {src: requestFromDd(DDPoint.spellIcon, j2.key + '.png', ddVers)});
+                block.find('.summonerSpells').prepend(spellBlk);
+                constructSpellTooltip(spellBlk)(j2);
+            });
+        }
+        else
+            block.find('.summonerSpells').append($('<img>', {src: 'static/img/noSpell.png'}));
         
-        requestFromApi(query.s, Endpoint.spell, player.spell2Id, {version: ddVers}, function(j3) {
-            block.find('.summonerSpells').append($('<img>', {src: requestFromDd(DDPoint.spellIcon, j3.key + '.png', ddVers)}));
-        });
+        if (player.spell2Id !== 0) {
+            requestFromApi(query.s, Endpoint.spell, player.spell2Id, {version: ddVers}, function(j3) {
+                var spellBlk = $('<img>', {src: requestFromDd(DDPoint.spellIcon, j3.key + '.png', ddVers)});
+                block.find('.summonerSpells').prepend(spellBlk);
+                constructSpellTooltip(spellBlk)(j3);
+            });
+        }
+        else
+            block.find('.summonerSpells').append($('<img>', {src: 'static/img/noSpell.png'}));
         
         for (var itemInd = 0; itemInd < 7; itemInd++) {
             var itemId = player.stats['item' + itemInd];
@@ -388,14 +400,35 @@ $(document).ready(function() {
         });
     };
     
-    var itemDescHtml = '<div class="itemName">{name}</div><div class="itemDesc">{desc}</div>';
+    var ttHtml = '<div class="itemName">{name}</div><div class="itemDesc">{desc}</div>';
     
     var constructItemTooltip = function(block) {
         return function(item) {
             var iDesc = item.description.replace(/BBFFFF/g, '00bcd4');
             block.mouseover(function() {
                 Controls.tooltip.css('display', 'block');
-                Controls.tooltip.html(itemDescHtml.supplant({name: item.name, desc: iDesc}));
+                Controls.tooltip.html(ttHtml.supplant({name: item.name, desc: iDesc}));
+            });
+            block.mouseout(function() {
+                Controls.tooltip.css('display', 'none');
+            });
+            block.mousemove(function(e) {
+                var posX = e.clientX + 8;
+                var posY = e.clientY + 8;
+                if (e.clientX + Controls.tooltip.innerWidth() > window.innerWidth)
+                    posX = e.clientX - Controls.tooltip.innerWidth() - 4;
+                if (e.clientY + Controls.tooltip.innerHeight() > window.innerHeight)
+                    posY = e.clientY - Controls.tooltip.innerHeight() - 4;
+                Controls.tooltip.css({top: posY + 'px', left: posX + 'px'});
+            });
+        };
+    };
+    
+    var constructSpellTooltip = function(block) {
+        return function(spell) {
+            block.mouseover(function() {
+                Controls.tooltip.css('display', 'block');
+                Controls.tooltip.html(ttHtml.supplant({name: spell.name, desc: spell.description}));
             });
             block.mouseout(function() {
                 Controls.tooltip.css('display', 'none');
