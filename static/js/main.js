@@ -121,6 +121,11 @@ $(document).ready(function() {
     var gameUrl = 'game.html?g={gid}&s={serv}&t={team}&c={cid}';
     
     var constructGameBlock = function(game, wGame) {
+        if (!game) {
+            $('#gameBlock' + wGame.gameId).html('<h2>Error retrieving match data!</h2>');
+            console.log(wGame);
+            return;
+        }
         parseDDVersion(game.gameVersion, query.s, function(ddVers) {
             var block = $('#gameBlock' + game.gameId);
             var players = {};
@@ -178,23 +183,31 @@ $(document).ready(function() {
                 var champImg = block.find('.championLarge');
                 champImg.attr('src', requestFromDd(DDPoint.championIcon, j1.key + '.png', ddVers));
                 constructTitledTooltip(champImg, j1.name, j1.title);
+                champImg.click(function() { dispatchWikiWindow(j1.name); });
             });
             requestFromApi(query.s, Endpoint.spell, thePlayer.spell1Id, {version: ddVers}, function(j2) {
                 var splBlock = $('<img>', {src: requestFromDd(DDPoint.spellIcon, j2.key + '.png', ddVers)});
                 block.find('.summonerSpells').prepend(splBlock);
                 constructSpellTooltip(splBlock)(j2);
+                splBlock.click(function() { dispatchWikiWindow(j2.name); });
             });
             requestFromApi(query.s, Endpoint.spell, thePlayer.spell2Id, {version: ddVers}, function(j3) {
                 var splBlock = $('<img>', {src: requestFromDd(DDPoint.spellIcon, j3.key + '.png', ddVers)});
                 block.find('.summonerSpells').append(splBlock);
                 constructSpellTooltip(splBlock)(j3);
+                splBlock.click(function() { dispatchWikiWindow(j3.name); });
             });
             for (var itemInd = 0; itemInd < 7; itemInd++) {
                 var itemId = thePlayer.stats['item' + itemInd];
                 if (itemId !== 0) {
                     var itemBlock = $('<img>', {src: requestFromDd(DDPoint.itemIcon, itemId + '.png', ddVers)});
                     block.find('.gameItems').append(itemBlock);
-                    requestFromApi(query.s, Endpoint.item, itemId, {version: ddVers}, constructItemTooltip(itemBlock));
+                    requestFromApi(query.s, Endpoint.item, itemId, {version: ddVers}, (function(iBlk) {
+                        return function(resp) {
+                            constructItemTooltip(iBlk)(resp);
+                            iBlk.click(function() { dispatchWikiWindow(resp.name); });
+                        }
+                    })(itemBlock));
                 }
                 else if (itemInd === 6)
                     block.find('.gameItems').append($('<img>', {src: 'static/img/noTrinket.png'}));
@@ -259,6 +272,12 @@ $(document).ready(function() {
         });
     };
     
+    var wikiBase = 'http://leagueoflegends.wikia.com/wiki/Special:Search?search=';
+    
+    var dispatchWikiWindow = function(query) {
+        window.open(wikiBase + query.replace(/Enchantment:\s|\s\(.+\)/g, ''));
+    };
+    
     var gameBlock = '<div class="gameBlock" id="gameBlock{gid}"></div>';
     var gameData = [];
     
@@ -267,11 +286,11 @@ $(document).ready(function() {
             gameData.push(game);
             var ind = gameData.indexOf(game) + 1;
             if (ind >= gameData.length) {
-                Controls.paneRight.append(gameBlock.supplant({gid: game.gameId}));
+                Controls.paneRight.append(gameBlock.supplant({gid: wGame.gameId}));
                 constructGameBlock(game, wGame);
             }
             else {
-                $('#gameBlock' + gameData[ind].gameId).before(gameBlock.supplant({gid: game.gameId}));
+                $('#gameBlock' + gameData[ind].gameId).before(gameBlock.supplant({gid: wGame.gameId}));
                 constructGameBlock(game, wGame);
             }
             if (++gameDataIndex < games.length)

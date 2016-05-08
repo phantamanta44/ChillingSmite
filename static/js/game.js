@@ -76,9 +76,14 @@ $(document).ready(function() {
                         var gsHeader = $('#gsHeader' + i), tsHeader = $('.tsHeader' + i);
                         gsHeader.html(imgHtml);
                         tsHeader.html(imgHtml);
-                        constructTitledTooltip($(gsHeader.children()[0]), j1.name, j1.title);
+                        var wikiFunc = function() { dispatchWikiWindow(j1.name); };
+                        var gsImg = $(gsHeader.children()[0]);
+                        constructTitledTooltip(gsImg, j1.name, j1.title);
+                        gsImg.click(wikiFunc);
                         $.each(tsHeader.children(), function(i, obj) {
-                            constructTitledTooltip($(obj), j1.name, j1.title);
+                            var tsImg = $(obj);
+                            constructTitledTooltip(tsImg, j1.name, j1.title);
+                            tsImg.click(wikiFunc)
                         });
                     });
                 });
@@ -208,6 +213,7 @@ $(document).ready(function() {
         requestFromApi(query.s, Endpoint.champion, player.championId, {version: ddVers}, function(j1) {
             var champImg = block.find('.championLarge');
             champImg.attr('src', requestFromDd(DDPoint.championIcon, j1.key + '.png', ddVers));
+            champImg.click(function() { dispatchWikiWindow(j1.name); });
             constructTitledTooltip(champImg, j1.name, j1.title);
             if (noIdentity) {
                 block.find('.summonerName').text(j1.name);
@@ -220,6 +226,7 @@ $(document).ready(function() {
                 var spellBlk = $('<img>', {src: requestFromDd(DDPoint.spellIcon, j2.key + '.png', ddVers)});
                 block.find('.summonerSpells').prepend(spellBlk);
                 constructSpellTooltip(spellBlk)(j2);
+                spellBlk.click(function() { dispatchWikiWindow(j2.name); });
             });
         }
         else
@@ -230,6 +237,7 @@ $(document).ready(function() {
                 var spellBlk = $('<img>', {src: requestFromDd(DDPoint.spellIcon, j3.key + '.png', ddVers)});
                 block.find('.summonerSpells').prepend(spellBlk);
                 constructSpellTooltip(spellBlk)(j3);
+                spellBlk.click(function() { dispatchWikiWindow(j3.name); });
             });
         }
         else
@@ -240,7 +248,12 @@ $(document).ready(function() {
             if (itemId !== 0) {
                 var itemBlock = $('<img>', {src: requestFromDd(DDPoint.itemIcon, itemId + '.png', ddVers)});
                 block.find('.gameItems').append(itemBlock);
-                requestFromApi(query.s, Endpoint.item, itemId, {version: ddVers}, constructItemTooltip(itemBlock));
+                requestFromApi(query.s, Endpoint.item, itemId, {version: ddVers}, (function(iBlk) {
+                    return function(resp) {
+                        constructItemTooltip(iBlk)(resp);
+                        iBlk.click(function() { dispatchWikiWindow(resp.name); });
+                    };
+                })(itemBlock));
             }
             else if (itemInd === 6)
                 block.find('.gameItems').append($('<img>', {src: 'static/img/noTrinket.png'}));
@@ -448,6 +461,12 @@ $(document).ready(function() {
                 posY = e.clientY - Controls.tooltip.innerHeight() - 4;
             Controls.tooltip.css({top: posY + 'px', left: posX + 'px'});
         });
+    };
+    
+    var wikiBase = 'http://leagueoflegends.wikia.com/wiki/Special:Search?search=';
+    
+    var dispatchWikiWindow = function(query) {
+        window.open(wikiBase + query.replace(/Enchantment:\s|\s\(.+\)/g, ''));
     };
     
     var queryTemplate = 'index.html?n={name}&s={serv}';

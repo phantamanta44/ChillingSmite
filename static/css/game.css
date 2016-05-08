@@ -262,6 +262,7 @@ select {
     max-height: 100%;
     max-width: 100%;
     box-shadow: 0 1px 3px #222;
+    cursor: pointer;
 }
 
 .rankIcon {
@@ -318,11 +319,13 @@ select {
     margin: auto 4.2%;
     vertical-align: middle;
     box-shadow: 0 1px 3px #222;
+    cursor: pointer;
 }
 
 .gameItems img {
     width: 11.6%;
     margin: auto 0.92%;
+    cursor: pointer;
 }
 
 .gbLower {
@@ -416,6 +419,7 @@ select {
 
 #gsTable img, .tsTable img {
     max-height: 3vw;
+    cursor: pointer;
 }
 
 #tsTabs {
