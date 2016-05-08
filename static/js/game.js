@@ -73,8 +73,13 @@ $(document).ready(function() {
                 $.each(queuedNames, function(i, id) {
                     requestFromApi(query.s, Endpoint.champion, id, {version: ddVers}, function(j1) {
                         var imgHtml = '<img src="' + requestFromDd(DDPoint.championIcon, j1.key + '.png', ddVers) + '"/>';
-                        $('#gsHeader' + i).html(imgHtml);
-                        $('.tsHeader' + i).html(imgHtml);
+                        var gsHeader = $('#gsHeader' + i), tsHeader = $('.tsHeader' + i);
+                        gsHeader.html(imgHtml);
+                        tsHeader.html(imgHtml);
+                        constructTitledTooltip($(gsHeader.children()[0]), j1.name, j1.title);
+                        $.each(tsHeader.children(), function(i, obj) {
+                            constructTitledTooltip($(obj), j1.name, j1.title);
+                        });
                     });
                 });
 
@@ -177,6 +182,11 @@ $(document).ready(function() {
         
         block.html(pbContent.supplant({upper: pbUpper, lower: lowerCont}));
         
+        constructTooltip(block.find('.statIcon.statScore'), 'Kill/Death/Assist Ratio');
+        constructTooltip(block.find('.statIcon.statMinion'), 'Creep Score');
+        constructTooltip(block.find('.statIcon.statLevel'), 'Champion Level');
+        constructTooltip(block.find('.statIcon.statGold'), 'Gold Earned');
+        
         if ((query.t == player.teamId) && (query.c == player.championId))
             block.css('background-color', '#bbdefb');
             
@@ -196,7 +206,9 @@ $(document).ready(function() {
             noIdentity = true;
         
         requestFromApi(query.s, Endpoint.champion, player.championId, {version: ddVers}, function(j1) {
-            block.find('.championLarge').attr('src', requestFromDd(DDPoint.championIcon, j1.key + '.png', ddVers));
+            var champImg = block.find('.championLarge');
+            champImg.attr('src', requestFromDd(DDPoint.championIcon, j1.key + '.png', ddVers));
+            constructTitledTooltip(champImg, j1.name, j1.title);
             if (noIdentity) {
                 block.find('.summonerName').text(j1.name);
                 appendRank(player, block);
@@ -405,44 +417,37 @@ $(document).ready(function() {
     var constructItemTooltip = function(block) {
         return function(item) {
             var iDesc = item.description.replace(/BBFFFF/g, '00bcd4');
-            block.mouseover(function() {
-                Controls.tooltip.css('display', 'block');
-                Controls.tooltip.html(ttHtml.supplant({name: item.name, desc: iDesc}));
-            });
-            block.mouseout(function() {
-                Controls.tooltip.css('display', 'none');
-            });
-            block.mousemove(function(e) {
-                var posX = e.clientX + 8;
-                var posY = e.clientY + 8;
-                if (e.clientX + Controls.tooltip.innerWidth() > window.innerWidth)
-                    posX = e.clientX - Controls.tooltip.innerWidth() - 4;
-                if (e.clientY + Controls.tooltip.innerHeight() > window.innerHeight)
-                    posY = e.clientY - Controls.tooltip.innerHeight() - 4;
-                Controls.tooltip.css({top: posY + 'px', left: posX + 'px'});
-            });
+            constructTitledTooltip(block, item.name, iDesc);
         };
     };
     
     var constructSpellTooltip = function(block) {
         return function(spell) {
-            block.mouseover(function() {
-                Controls.tooltip.css('display', 'block');
-                Controls.tooltip.html(ttHtml.supplant({name: spell.name, desc: spell.description}));
-            });
-            block.mouseout(function() {
-                Controls.tooltip.css('display', 'none');
-            });
-            block.mousemove(function(e) {
-                var posX = e.clientX + 8;
-                var posY = e.clientY + 8;
-                if (e.clientX + Controls.tooltip.innerWidth() > window.innerWidth)
-                    posX = e.clientX - Controls.tooltip.innerWidth() - 4;
-                if (e.clientY + Controls.tooltip.innerHeight() > window.innerHeight)
-                    posY = e.clientY - Controls.tooltip.innerHeight() - 4;
-                Controls.tooltip.css({top: posY + 'px', left: posX + 'px'});
-            });
+            constructTitledTooltip(block, spell.name, spell.description);
         };
+    };
+    
+    var constructTitledTooltip = function(block, title, text) {
+        constructTooltip(block, ttHtml.supplant({name: title, desc: text}))
+    }
+    
+    var constructTooltip = function(block, text) {
+        block.mouseover(function() {
+            Controls.tooltip.css('display', 'block');
+            Controls.tooltip.html(text);
+        });
+        block.mouseout(function() {
+            Controls.tooltip.css('display', 'none');
+        });
+        block.mousemove(function(e) {
+            var posX = e.clientX + 8;
+            var posY = e.clientY + 8;
+            if (e.clientX + Controls.tooltip.innerWidth() > window.innerWidth)
+                posX = e.clientX - Controls.tooltip.innerWidth() - 4;
+            if (e.clientY + Controls.tooltip.innerHeight() > window.innerHeight)
+                posY = e.clientY - Controls.tooltip.innerHeight() - 4;
+            Controls.tooltip.css({top: posY + 'px', left: posX + 'px'});
+        });
     };
     
     var queryTemplate = 'index.html?n={name}&s={serv}';
@@ -472,7 +477,6 @@ $(document).ready(function() {
     }
     
     var linkEffects = function() {
-        console.log($('a'));
         $('a').click(function(e) {
             e.preventDefault();
             unclearLoading(function() { window.location = $(e.target).closest('a').attr('href'); });

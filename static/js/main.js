@@ -166,17 +166,28 @@ $(document).ready(function() {
             var lowerCont = gbLower.supplant({gameTime: gameTime, gameDate: gameDate, gameMode: gameType[game.queueId], gStats: gameStats, gStats2: gameStats2});
 
             block.html(gbContent.supplant({upper: upperCont, lower: lowerCont}));
+            
+            constructTooltip(block.find('.statIcon.statScore'), 'Kill/Death/Assist Ratio');
+            constructTooltip(block.find('.statIcon.statMinion'), 'Creep Score');
+            constructTooltip(block.find('.statIcon.statLevel'), 'Champion Level');
+            constructTooltip(block.find('.statIcon.statGold'), 'Gold Earned');
 
             block.find('.gameOutcome').css('background-color', won ? '#81c784' : '#e57373');
 
             requestFromApi(query.s, Endpoint.champion, thePlayer.championId, {version: ddVers}, function(j1) {
-                block.find('.championLarge').attr('src', requestFromDd(DDPoint.championIcon, j1.key + '.png', ddVers));
+                var champImg = block.find('.championLarge');
+                champImg.attr('src', requestFromDd(DDPoint.championIcon, j1.key + '.png', ddVers));
+                constructTitledTooltip(champImg, j1.name, j1.title);
             });
             requestFromApi(query.s, Endpoint.spell, thePlayer.spell1Id, {version: ddVers}, function(j2) {
-                block.find('.summonerSpells').prepend($('<img>', {src: requestFromDd(DDPoint.spellIcon, j2.key + '.png', ddVers)}));
+                var splBlock = $('<img>', {src: requestFromDd(DDPoint.spellIcon, j2.key + '.png', ddVers)});
+                block.find('.summonerSpells').prepend(splBlock);
+                constructSpellTooltip(splBlock)(j2);
             });
             requestFromApi(query.s, Endpoint.spell, thePlayer.spell2Id, {version: ddVers}, function(j3) {
-                block.find('.summonerSpells').append($('<img>', {src: requestFromDd(DDPoint.spellIcon, j3.key + '.png', ddVers)}));
+                var splBlock = $('<img>', {src: requestFromDd(DDPoint.spellIcon, j3.key + '.png', ddVers)});
+                block.find('.summonerSpells').append(splBlock);
+                constructSpellTooltip(splBlock)(j3);
             });
             for (var itemInd = 0; itemInd < 7; itemInd++) {
                 var itemId = thePlayer.stats['item' + itemInd];
@@ -210,28 +221,42 @@ $(document).ready(function() {
         });
     };
     
-    var itemDescHtml = '<div class="itemName">{name}</div><div class="itemDesc">{desc}</div>';
+    var ttHtml = '<div class="itemName">{name}</div><div class="itemDesc">{desc}</div>';
     
     var constructItemTooltip = function(block) {
         return function(item) {
             var iDesc = item.description.replace(/BBFFFF/g, '00bcd4');
-            block.mouseover(function() {
-                Controls.tooltip.css('display', 'block');
-                Controls.tooltip.html(itemDescHtml.supplant({name: item.name, desc: iDesc}));
-            });
-            block.mouseout(function() {
-                Controls.tooltip.css('display', 'none');
-            });
-            block.mousemove(function(e) {
-                var posX = e.clientX + 8;
-                var posY = e.clientY + 8;
-                if (e.clientX + Controls.tooltip.innerWidth() > window.innerWidth)
-                    posX = e.clientX - Controls.tooltip.innerWidth() - 4;
-                if (e.clientY + Controls.tooltip.innerHeight() > window.innerHeight)
-                    posY = e.clientY - Controls.tooltip.innerHeight() - 4;
-                Controls.tooltip.css({top: posY + 'px', left: posX + 'px'});
-            });
+            constructTitledTooltip(block, item.name, iDesc);
         };
+    };
+    
+    var constructSpellTooltip = function(block) {
+        return function(spell) {
+            constructTitledTooltip(block, spell.name, spell.description);
+        };
+    };
+    
+    var constructTitledTooltip = function(block, title, text) {
+        constructTooltip(block, ttHtml.supplant({name: title, desc: text}))
+    }
+    
+    var constructTooltip = function(block, text) {
+        block.mouseover(function() {
+            Controls.tooltip.css('display', 'block');
+            Controls.tooltip.html(text);
+        });
+        block.mouseout(function() {
+            Controls.tooltip.css('display', 'none');
+        });
+        block.mousemove(function(e) {
+            var posX = e.clientX + 8;
+            var posY = e.clientY + 8;
+            if (e.clientX + Controls.tooltip.innerWidth() > window.innerWidth)
+                posX = e.clientX - Controls.tooltip.innerWidth() - 4;
+            if (e.clientY + Controls.tooltip.innerHeight() > window.innerHeight)
+                posY = e.clientY - Controls.tooltip.innerHeight() - 4;
+            Controls.tooltip.css({top: posY + 'px', left: posX + 'px'});
+        });
     };
     
     var gameBlock = '<div class="gameBlock" id="gameBlock{gid}"></div>';
