@@ -106,7 +106,7 @@ $(document).ready(function() {
     var gStats2 = '<div class="gameLevel"><img class="statIcon statLevel" src="static/img/champion.png"/><p>Level {level}<div class="pipeBreak">|</div>{xpm} XPM</p></div>\
         <div class="gameGold"><img class="statIcon statGold" src="static/img/gold.png"/><p>{gold}<div class="pipeBreak">|</div>{gpm} GPM</p></div>';
     var gameType = {
-        0: 'Custom Match', 8: 'Blind Pick 3v3', 2: 'Blind Pick 5v5', 14: 'Draft Pick 5v5',
+        0: 'Custom Match', 8: 'Blind Pick 3v3', 2: 'Blind Pick 5v5', 14: 'wDraft Pick 5v5',
         4: 'Solo Queue 5v5', 6: 'Ranked Premade 5v5', 9: 'Ranked Premade 3v3',
         41: 'Team Match 3v3', 42: 'Team Match 5v5', 16: 'Blind Pick Dominion',
         17: 'Draft Pick Dominion', 7: 'Botmatch 5v5', 25: 'Botmatch Dominion', 31: 'Botmatch 5v5',
@@ -184,18 +184,21 @@ $(document).ready(function() {
                 champImg.attr('src', requestFromDd(DDPoint.championIcon, j1.key + '.png', ddVers));
                 constructTitledTooltip(champImg, j1.name, j1.title);
                 champImg.click(function() { dispatchWikiWindow(j1.name); });
+                champImg.css('cursor', 'pointer');
             });
             requestFromApi(query.s, Endpoint.spell, thePlayer.spell1Id, {version: ddVers}, function(j2) {
                 var splBlock = $('<img>', {src: requestFromDd(DDPoint.spellIcon, j2.key + '.png', ddVers)});
                 block.find('.summonerSpells').prepend(splBlock);
                 constructSpellTooltip(splBlock)(j2);
                 splBlock.click(function() { dispatchWikiWindow(j2.name); });
+                splBlock.css('cursor', 'pointer');
             });
             requestFromApi(query.s, Endpoint.spell, thePlayer.spell2Id, {version: ddVers}, function(j3) {
                 var splBlock = $('<img>', {src: requestFromDd(DDPoint.spellIcon, j3.key + '.png', ddVers)});
                 block.find('.summonerSpells').append(splBlock);
                 constructSpellTooltip(splBlock)(j3);
                 splBlock.click(function() { dispatchWikiWindow(j3.name); });
+                splBlock.css('cursor', 'pointer');
             });
             for (var itemInd = 0; itemInd < 7; itemInd++) {
                 var itemId = thePlayer.stats['item' + itemInd];
@@ -206,6 +209,7 @@ $(document).ready(function() {
                         return function(resp) {
                             constructItemTooltip(iBlk)(resp);
                             iBlk.click(function() { dispatchWikiWindow(resp.name); });
+                            iBlk.css('cursor', 'pointer');
                         }
                     })(itemBlock));
                 }

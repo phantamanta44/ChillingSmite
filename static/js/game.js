@@ -80,10 +80,12 @@ $(document).ready(function() {
                         var gsImg = $(gsHeader.children()[0]);
                         constructTitledTooltip(gsImg, j1.name, j1.title);
                         gsImg.click(wikiFunc);
+                        gsImg.css('cursor', 'pointer');
                         $.each(tsHeader.children(), function(i, obj) {
                             var tsImg = $(obj);
                             constructTitledTooltip(tsImg, j1.name, j1.title);
                             tsImg.click(wikiFunc)
+                            tsImg.css('cursor', 'pointer');
                         });
                     });
                 });
@@ -214,6 +216,7 @@ $(document).ready(function() {
             var champImg = block.find('.championLarge');
             champImg.attr('src', requestFromDd(DDPoint.championIcon, j1.key + '.png', ddVers));
             champImg.click(function() { dispatchWikiWindow(j1.name); });
+            champImg.css('cursor', 'pointer');
             constructTitledTooltip(champImg, j1.name, j1.title);
             if (noIdentity) {
                 block.find('.summonerName').text(j1.name);
@@ -227,6 +230,7 @@ $(document).ready(function() {
                 block.find('.summonerSpells').prepend(spellBlk);
                 constructSpellTooltip(spellBlk)(j2);
                 spellBlk.click(function() { dispatchWikiWindow(j2.name); });
+                spellBlk.css('cursor', 'pointer');
             });
         }
         else
@@ -238,6 +242,7 @@ $(document).ready(function() {
                 block.find('.summonerSpells').prepend(spellBlk);
                 constructSpellTooltip(spellBlk)(j3);
                 spellBlk.click(function() { dispatchWikiWindow(j3.name); });
+                spellBlk.css('cursor', 'pointer');
             });
         }
         else
@@ -252,6 +257,7 @@ $(document).ready(function() {
                     return function(resp) {
                         constructItemTooltip(iBlk)(resp);
                         iBlk.click(function() { dispatchWikiWindow(resp.name); });
+                        iBlk.css('cursor', 'pointer');
                     };
                 })(itemBlock));
             }
